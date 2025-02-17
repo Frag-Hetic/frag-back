@@ -3,6 +3,7 @@ package com.projet.hetic.frag.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Chunk")
@@ -13,7 +14,7 @@ public class Chunk {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(length = 64, nullable = false)
+  @Column(length = 64, nullable = false, unique = true)
   private String hash;
 
   private Integer sizeOriginal;
@@ -27,4 +28,7 @@ public class Chunk {
 
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+
+  @OneToMany(mappedBy = "chunk", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<FilesChunks> filesChunks;
 }
