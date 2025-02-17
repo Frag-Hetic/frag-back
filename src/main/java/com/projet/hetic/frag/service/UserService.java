@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.projet.hetic.frag.dto.UserDto;
+import com.projet.hetic.frag.mapper.UserMapper;
 import com.projet.hetic.frag.repository.UserRepository;
 
 @Service
