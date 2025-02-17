@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projet.hetic.frag.dto.UserDto;
 import com.projet.hetic.frag.service.UserService;
+import com.projet.hetic.frag.exception.UserNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,9 +32,9 @@ public class UserController {
 
   @GetMapping("/{id}")
   public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-    return userService.getUserById(id)
-        .map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+    return ResponseEntity.ok(
+        userService.getUserById(id)
+            .orElseThrow(() -> new UserNotFoundException(id)));
   }
 
 }
