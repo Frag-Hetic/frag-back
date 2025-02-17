@@ -5,8 +5,11 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Entity
-@Table(name = "File")
+@Table(name = "file")
 @Data
 public class File {
 
@@ -14,18 +17,24 @@ public class File {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false)
   private String filename;
+
+  @Column(nullable = false)
   private Long fileSize;
 
-  @Column(name = "mime_t", length = 150, unique = true)
+  @Column(name = "mime_type", length = 150, unique = true, nullable = false)
   private String mimeType;
 
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
-
-  @Column(length = 64)
+  @Column(length = 64, nullable = false)
   private String checkhash;
 
   @OneToMany(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<FilesChunks> filesChunks;
+
+  @CreationTimestamp
+  private LocalDateTime createdAt;
+
+  @UpdateTimestamp
+  private LocalDateTime updatedAt;
 }
