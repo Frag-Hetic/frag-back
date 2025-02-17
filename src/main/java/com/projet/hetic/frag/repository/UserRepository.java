@@ -9,5 +9,5 @@ import com.projet.hetic.frag.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-  Optional<User> findById(String id); // Requête personnalisée
+  Optional<User> findByEmail(String email); // Requête personnalisée
 }

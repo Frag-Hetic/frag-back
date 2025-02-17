@@ -1,5 +1,6 @@
 package com.projet.hetic.frag.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -17,8 +18,12 @@ public class UserService {
     this.userRepository = userRepository;
   }
 
+  public List<UserDto> getAllUsers() {
+    return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
+  }
+
   public Optional<UserDto> getUserById(Long id) {
     return userRepository.findById(id)
-        .map(UserMapper::toDTO); // Convertit l'entité User en DTO
+        .map(UserMapper::toDTO);
   }
 }
