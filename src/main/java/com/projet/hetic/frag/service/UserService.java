@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.projet.hetic.frag.dto.UserDto;
 import com.projet.hetic.frag.repository.UserRepository;
 
 @Service
@@ -15,7 +16,7 @@ public class UserService {
     this.userRepository = userRepository;
   }
 
-  public Optional<UserDTO> getUserById(Long id) {
+  public Optional<UserDto> getUserById(Long id) {
     return userRepository.findById(id)
         .map(UserMapper::toDTO); // Convertit l'entité User en DTO
   }

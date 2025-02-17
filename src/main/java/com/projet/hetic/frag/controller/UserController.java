@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.projet.hetic.frag.dto.UserDto;
 import com.projet.hetic.frag.service.UserService;
 
 @RestController
@@ -18,7 +19,7 @@ public class UserController {
   }
 
   @GetMapping("/")
-  public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+  public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
     return userService.getUserById(id)
         .map(ResponseEntity::ok)
         .orElse(ResponseEntity.notFound().build());
