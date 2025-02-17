@@ -1,6 +1,7 @@
 package com.projet.hetic.frag.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,9 +52,9 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+  public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
     userService.deleteUser(id);
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok(Map.of("status", "success", "message", "User deleted successfully"));
   }
 
 }
