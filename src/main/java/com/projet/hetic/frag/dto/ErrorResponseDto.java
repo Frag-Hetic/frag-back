@@ -1,14 +1,13 @@
 package com.projet.hetic.frag.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserOutputDto {
-  private Long id;
-  private String name;
-  private String email;
+public class ErrorResponseDto {
+  private String status;
+  private Object errors;
 }

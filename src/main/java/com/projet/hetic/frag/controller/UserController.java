@@ -17,9 +17,8 @@ import com.projet.hetic.frag.dto.UserInputDto;
 import com.projet.hetic.frag.dto.UserOutputDto;
 import com.projet.hetic.frag.service.UserService;
 
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
 
-@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -42,12 +41,13 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<UserOutputDto> createUser(@RequestBody UserInputDto userInputDto) {
-    return ResponseEntity.ok(userService.createUser(userInputDto));
+  public ResponseEntity<UserOutputDto> createUser(@Valid @RequestBody UserInputDto userInputDto) {
+    return ResponseEntity.created(null).body(userService.createUser(userInputDto));
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<UserOutputDto> updateUser(@PathVariable Long id, @RequestBody UserInputDto userInputDto) {
+  public ResponseEntity<UserOutputDto> updateUser(@PathVariable Long id,
+      @Valid @RequestBody UserInputDto userInputDto) {
     return ResponseEntity.ok(userService.updateUser(id, userInputDto));
   }
 
