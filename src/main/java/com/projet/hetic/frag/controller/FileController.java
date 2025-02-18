@@ -1,7 +1,5 @@
 package com.projet.hetic.frag.controller;
 
-import com.projet.hetic.frag.dto.FileResponseDTO;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
