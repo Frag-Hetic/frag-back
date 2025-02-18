@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.projet.hetic.frag.dto.UserInputDto;
 import com.projet.hetic.frag.dto.UserOutputDto;
-import com.projet.hetic.frag.exception.UserNotFoundException;
+import com.projet.hetic.frag.exception.EntityNotFoundException;
 import com.projet.hetic.frag.mapper.UserMapper;
 import com.projet.hetic.frag.model.User;
 import com.projet.hetic.frag.repository.UserRepository;
@@ -29,7 +29,7 @@ public class UserService {
   public UserOutputDto getUserById(Long id) {
     return userRepository.findById(id)
         .map(userMapper::toDTO)
-        .orElseThrow(() -> new UserNotFoundException(id));
+        .orElseThrow(() -> new EntityNotFoundException("User", "id", id.toString()));
   }
 
   public UserOutputDto createUser(UserInputDto userInputDto) {
@@ -45,12 +45,12 @@ public class UserService {
           existingUser.setEmail(userInputDto.getEmail());
           return userMapper.toDTO(userRepository.save(existingUser));
         })
-        .orElseThrow(() -> new UserNotFoundException(id));
+        .orElseThrow(() -> new EntityNotFoundException("User", "id", id.toString()));
   }
 
   public void deleteUser(Long id) {
     if (!userRepository.existsById(id)) {
-      throw new UserNotFoundException(id);
+      throw new EntityNotFoundException("User", "id", id.toString());
     }
     userRepository.deleteById(id);
   }

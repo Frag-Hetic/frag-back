@@ -15,8 +15,8 @@ import com.projet.hetic.frag.dto.ErrorResponseDto;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(UserNotFoundException.class)
-  public ResponseEntity<ErrorResponseDto> handleUserNotFoundException(UserNotFoundException ex) {
+  @ExceptionHandler(EntityNotFoundException.class)
+  public ResponseEntity<ErrorResponseDto> handleEntityNotFoundException(EntityNotFoundException ex) {
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .body(new ErrorResponseDto("error", ex.getMessage()));
