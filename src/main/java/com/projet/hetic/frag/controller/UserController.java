@@ -1,5 +1,6 @@
 package com.projet.hetic.frag.controller;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,9 @@ public class UserController {
 
   @PostMapping
   public ResponseEntity<UserOutputDto> createUser(@Valid @RequestBody UserInputDto userInputDto) {
-    return ResponseEntity.created(null).body(userService.createUser(userInputDto));
+    UserOutputDto createdUser = userService.createUser(userInputDto);
+    URI location = URI.create(String.format("/users/%d", createdUser.getId()));
+    return ResponseEntity.created(location).body(createdUser);
   }
 
   @PutMapping("/{id}")
