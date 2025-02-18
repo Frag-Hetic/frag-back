@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -23,10 +25,12 @@ public class FileChunk {
 
   @ManyToOne
   @JoinColumn(name = "file_id", nullable = false)
+  @JsonBackReference
   private File file;
 
   @ManyToOne
   @JoinColumn(name = "chunk_id", nullable = false)
+  @JsonBackReference
   private Chunk chunk;
 
   @Column(nullable = false, name = "chunk_order")

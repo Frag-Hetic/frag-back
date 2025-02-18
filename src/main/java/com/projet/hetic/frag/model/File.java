@@ -8,6 +8,8 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "file")
 @Data
@@ -30,6 +32,7 @@ public class File {
   private String checkhash;
 
   @OneToMany(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonManagedReference
   private List<FileChunk> filesChunks;
 
   @CreationTimestamp
