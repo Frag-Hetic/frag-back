@@ -27,7 +27,7 @@ public class FileController {
 
     @PostMapping("/split")
     public ResponseEntity<File> splitFile(@RequestParam("file") MultipartFile multipartFile) {
-        File file = fileService.createFile(multipartFile);
+        File file = new File();
         fileService.processAndSplitFile(multipartFile);
         return ResponseEntity.ok(file);
     }
