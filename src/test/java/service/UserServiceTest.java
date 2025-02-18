@@ -55,7 +55,7 @@ class UserServiceTest {
 
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         // Initialize mock user
         mockUser = new User();
         mockUser.setId(USER_ID);
