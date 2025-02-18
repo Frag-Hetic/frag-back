@@ -4,15 +4,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.projet.hetic.frag.model.Chunk;
 import com.projet.hetic.frag.repository.ChunkRepository;
 
+@Service
 public class HashingService {
 
-  @Autowired
-  private ChunkRepository chunkRepository;
+  private final ChunkRepository chunkRepository;
+
+  public HashingService(ChunkRepository chunkRepository) {
+    this.chunkRepository = chunkRepository;
+  }
 
   public String calculateSHA256(byte[] chunk) {
     try {
