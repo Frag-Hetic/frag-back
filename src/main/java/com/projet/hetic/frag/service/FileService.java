@@ -1,6 +1,7 @@
 package com.projet.hetic.frag.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,5 +36,9 @@ public class FileService {
     file.setCheckhash(hash);
 
     return fileRepository.save(file);
+  }
+
+  public List<File> getAllFile() {
+    return fileRepository.findAll();
   }
 }

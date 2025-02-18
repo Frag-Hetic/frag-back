@@ -1,5 +1,7 @@
 package com.projet.hetic.frag.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +16,12 @@ public class FileController {
 
     public FileController(FileService fileService) {
         this.fileService = fileService;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<File>> getFiles() {
+        List<File> files = fileService.getAllFile();
+        return ResponseEntity.ok(files);
     }
 
     @PostMapping("/split")
