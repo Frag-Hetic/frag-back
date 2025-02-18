@@ -1,6 +1,8 @@
 package com.projet.hetic.frag.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.projet.hetic.frag.mapper.ChunkMapper;
 import com.projet.hetic.frag.model.Chunk;
@@ -21,6 +23,7 @@ public class ChunkService {
     this.chunkRepository = chunkRepository;
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   public Chunk findOrCreateChunk(byte[] bytes) {
     byte[] compressedBytes = compressionService.compressChunk(bytes);
     String hash = hashingService.calculateSHA256(compressedBytes);

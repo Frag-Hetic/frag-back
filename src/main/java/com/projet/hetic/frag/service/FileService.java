@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.projet.hetic.frag.exception.FileProcessingException;
@@ -30,6 +32,7 @@ public class FileService {
     this.chunkService = chunkService;
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   public File createFile(MultipartFile multipartFile) {
     File file = fileMapper.multipartToEntity(multipartFile);
 
@@ -46,10 +49,12 @@ public class FileService {
     return fileRepository.save(file);
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   public List<File> getAllFile() {
     return fileRepository.findAll();
   }
 
+  @Transactional(propagation = Propagation.REQUIRED)
   public void processAndSplitFile(MultipartFile multipartFile) {
     // Créer l'entité File
     // File file = createFile(multipartFile);
