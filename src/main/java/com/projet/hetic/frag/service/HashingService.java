@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.projet.hetic.frag.exception.EntityNotFoundException;
 import com.projet.hetic.frag.model.Chunk;
 import com.projet.hetic.frag.repository.ChunkRepository;
 
@@ -28,7 +29,7 @@ public class HashingService {
       }
       return hexString.toString();
     } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException("SHA-256 algorithm not found", e);
+      throw new EntityNotFoundException("Hash", "algorithm", "SHA-256");
     }
   }
 
