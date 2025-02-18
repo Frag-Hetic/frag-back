@@ -30,10 +30,13 @@ public class FileMapper {
      * Convertit un MultipartFile en entité FileInputDto
      * 
      * @param multipartFile
-     * @return Entité FileInputDto
+     * @return Entité FileInputDto without hash
      */
-    public FileIntputDto toEntity(MultipartFile multipartFile) {
+    public FileIntputDto multipartToInputDto(MultipartFile multipartFile) {
         FileIntputDto fileInputDto = new FileIntputDto();
+        fileInputDto.setFileSize(multipartFile.getSize());
+        fileInputDto.setFilename(multipartFile.getOriginalFilename());
+        fileInputDto.setMimeType(multipartFile.getContentType());
         return fileInputDto;
     }
 }

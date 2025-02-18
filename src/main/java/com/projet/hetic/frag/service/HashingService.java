@@ -19,10 +19,10 @@ public class HashingService {
     this.chunkRepository = chunkRepository;
   }
 
-  public String calculateSHA256(byte[] chunk) {
+  public String calculateSHA256(byte[] bitesArray) {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
-      byte[] hash = digest.digest(chunk);
+      byte[] hash = digest.digest(bitesArray);
       StringBuilder hexString = new StringBuilder();
       for (byte b : hash) {
         hexString.append(String.format("%02x", b));
