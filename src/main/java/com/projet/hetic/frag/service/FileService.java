@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.projet.hetic.frag.dto.FileIntputDto;
 import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
 
@@ -20,7 +19,7 @@ public class FileService {
   }
 
   public File createFile(MultipartFile multipartFile) {
-    FileIntputDto fileInpuDdto = fileMapper.multipartToInputDto(multipartFile);
+    File file = fileMapper.multipartToEntity(multipartFile);
 
     byte[] bytes;
     try {
@@ -30,9 +29,7 @@ public class FileService {
     }
 
     String hash = hashingService.calculateSHA256(bytes);
-    fileInpuDdto.setCheckhash(hash);
-
-    File file = new File();
+    file.setCheckhash(hash);
     return file;
   }
 }

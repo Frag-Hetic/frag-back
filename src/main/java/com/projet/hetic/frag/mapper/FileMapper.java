@@ -1,6 +1,7 @@
 package com.projet.hetic.frag.mapper;
 
-import com.projet.hetic.frag.dto.FileIntputDto;
+import com.projet.hetic.frag.model.File;
+
 //import com.projet.hetic.frag.dto.FileResponseDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,11 +33,11 @@ public class FileMapper {
      * @param multipartFile
      * @return Entité FileInputDto without hash
      */
-    public FileIntputDto multipartToInputDto(MultipartFile multipartFile) {
-        FileIntputDto fileInputDto = new FileIntputDto();
-        fileInputDto.setFileSize(multipartFile.getSize());
-        fileInputDto.setFilename(multipartFile.getOriginalFilename());
-        fileInputDto.setMimeType(multipartFile.getContentType());
-        return fileInputDto;
+    public File multipartToEntity(MultipartFile multipartFile) {
+        File file = new File();
+        file.setFileSize(multipartFile.getSize());
+        file.setFilename(multipartFile.getOriginalFilename());
+        file.setMimeType(multipartFile.getContentType());
+        return file;
     }
 }
