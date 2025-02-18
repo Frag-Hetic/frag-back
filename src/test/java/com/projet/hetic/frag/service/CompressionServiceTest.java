@@ -18,8 +18,6 @@ class CompressionServiceTest {
 
         // Compression
         byte[] compressedData = compressionService.compressChunk(originalData);
-        System.out.println("Taille originale : " + originalData.length);
-        System.out.println("Taille compressée : " + compressedData.length);
         assertNotNull(compressedData, "La compression ZLIB a échoué");
         assertTrue(compressedData.length < originalData.length, "La taille compressée doit être inférieure à la taille originale");
 
@@ -27,8 +25,5 @@ class CompressionServiceTest {
         byte[] decompressedData = compressionService.decompressChunk(compressedData);
         assertNotNull(decompressedData, "La décompression ZLIB a échoué");
         assertArrayEquals(originalData, decompressedData, "Les données décompressées ne correspondent pas aux originales");
-
-
-
     }
 }
