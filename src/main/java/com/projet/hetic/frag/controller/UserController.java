@@ -18,10 +18,12 @@ import com.projet.hetic.frag.dto.UserInputDto;
 import com.projet.hetic.frag.dto.UserOutputDto;
 import com.projet.hetic.frag.service.UserService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
+@Tag(name = "Users", description = "User management endpoints")
 public class UserController {
   private final UserService userService;
 
