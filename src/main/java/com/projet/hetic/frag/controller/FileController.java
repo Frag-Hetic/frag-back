@@ -1,16 +1,25 @@
 package com.projet.hetic.frag.controller;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.model.File;
+import com.projet.hetic.frag.service.FileService;
+
 @RestController
-@RequiredArgsConstructor
+@RequestMapping("/files")
 public class FileController {
+    private final FileService fileService;
+
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
+    }
+
     @PostMapping("/split")
-    public ResponseEntity<String> splitFile(@RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(file.getOriginalFilename());
+    public ResponseEntity<File> splitFile(@RequestParam("file") MultipartFile multipartFile) {
+        File file = fileService.createFile(multipartFile);
+        return ResponseEntity.ok(file);
     }
 
     @GetMapping("/chunks")
