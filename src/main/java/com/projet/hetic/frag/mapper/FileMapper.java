@@ -1,8 +1,9 @@
 package com.projet.hetic.frag.mapper;
 
+import com.projet.hetic.frag.dto.FileIntputDto;
 //import com.projet.hetic.frag.dto.FileResponseDTO;
-//import com.projet.hetic.frag.model.File;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Convertit des entités JPA en DTOs et inversement.
@@ -12,24 +13,27 @@ public class FileMapper {
 
     /**
      * Convertit une entité File en DTO.
+     * 
      * @param file Entité File
      * @return DTO correspondant
      */
-//    public FileResponseDTO toDto(File file) {
-//        return new FileResponseDTO(
-//                file.getId(),
-//                file.getFilename(),
-//                file.getFileSize(),
-//                file.getMimeType()
-//        );
-//    }
+    // public FileResponseDTO toDto(File file) {
+    // return new FileResponseDTO(
+    // file.getId(),
+    // file.getFilename(),
+    // file.getFileSize(),
+    // file.getMimeType()
+    // );
+    // }
 
     /**
-     * Convertit un DTO en entité File (sans id ni relation avec les chunks).
-     * @param dto DTO FileResponseDTO
-     * @return Entité File
+     * Convertit un MultipartFile en entité FileInputDto
+     * 
+     * @param multipartFile
+     * @return Entité FileInputDto
      */
-//    public File toEntity(FileResponseDTO dto) {
-//        return new File(null, dto.filename(), dto.size(), dto.mimeType(), null);
-//    }
+    public FileIntputDto toEntity(MultipartFile multipartFile) {
+        FileIntputDto fileInputDto = new FileIntputDto();
+        return fileInputDto;
+    }
 }
