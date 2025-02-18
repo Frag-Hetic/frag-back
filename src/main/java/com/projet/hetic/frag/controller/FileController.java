@@ -18,7 +18,7 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<File>> getFiles() {
         List<File> files = fileService.getAllFile();
         return ResponseEntity.ok(files);
