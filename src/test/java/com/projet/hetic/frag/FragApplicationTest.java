@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
     "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1"
 })
 @ActiveProfiles("test")
-class FragApplicationTests {
+class FragApplicationTest {
 
     @Test
     void contextLoads() {

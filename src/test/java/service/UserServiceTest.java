@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.projet.hetic.frag.dto.UserInputDto;
 import com.projet.hetic.frag.dto.UserOutputDto;
-import com.projet.hetic.frag.exception.UserNotFoundException;
+import com.projet.hetic.frag.exception.EntityNotFoundException;
 import com.projet.hetic.frag.mapper.UserMapper;
 import com.projet.hetic.frag.model.User;
 import com.projet.hetic.frag.repository.UserRepository;
@@ -52,6 +52,7 @@ class UserServiceTest {
     private UserInputDto mockInputDto;
     private List<User> mockUserList;
     private List<UserOutputDto> mockUserDtoList;
+
 
     @BeforeEach
     void setUp() {
@@ -114,9 +115,14 @@ class UserServiceTest {
     void getUserById_ShouldThrowException_WhenUserNotFound() {
         // Given
         when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
-
+    
         // When & Then
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById(USER_ID));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, 
+            () -> userService.getUserById(USER_ID));
+        
+        // Verify exception message
+        assertEquals("User not found with id: " + USER_ID, exception.getMessage());
+        
         verify(userRepository).findById(USER_ID);
     }
 
@@ -177,7 +183,11 @@ class UserServiceTest {
         when(userRepository.existsById(USER_ID)).thenReturn(false);
 
         // When & Then
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(USER_ID));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, 
+        () -> userService.deleteUser(USER_ID));
+        
+        assertEquals("User not found with id: " + USER_ID, exception.getMessage());
+
         verify(userRepository).existsById(USER_ID);
         verify(userRepository, never()).deleteById(any());
     }
