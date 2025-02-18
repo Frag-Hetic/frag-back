@@ -4,31 +4,36 @@ import org.springframework.stereotype.Service;
 
 import com.projet.hetic.frag.mapper.ChunkMapper;
 import com.projet.hetic.frag.model.Chunk;
+import com.projet.hetic.frag.repository.ChunkRepository;
 
 @Service
 public class ChunkService {
   private final ChunkMapper chunkMapper;
   private final CompressionService compressionService;
   private final HashingService hashingService;
+  private final ChunkRepository chunkRepository;
 
-  public ChunkService(ChunkMapper chunkMapper, CompressionService compressionService, HashingService hashingService) {
+  public ChunkService(ChunkMapper chunkMapper, CompressionService compressionService, HashingService hashingService,
+      ChunkRepository chunkRepository) {
     this.chunkMapper = chunkMapper;
     this.compressionService = compressionService;
     this.hashingService = hashingService;
+    this.chunkRepository = chunkRepository;
   }
 
-  public Chunk createChunk(byte[] bytes) {
-    Chunk chunk = chunkMapper.bytesToEntity(bytes);
-
+  public Chunk findOrCreateChunk(byte[] bytes) {
     byte[] compressedBytes = compressionService.compressChunk(bytes);
-    chunk.setData(compressedBytes);
-    chunk.setSizeCompressed(compressedBytes.length);
-    chunk.setCompressionType("ZLIB");
-
     String hash = hashingService.calculateSHA256(compressedBytes);
-    chunk.setHash(hash);
 
-    return chunk;
+    return chunkRepository.findByHash(hash)
+        .orElseGet(() -> {
+          Chunk chunk = chunkMapper.bytesToEntity(bytes);
+          chunk.setData(compressedBytes);
+          chunk.setSizeCompressed(compressedBytes.length);
+          chunk.setCompressionType("ZLIB");
+          chunk.setHash(hash);
+          return chunkRepository.save(chunk);
+        });
   }
 
 }
