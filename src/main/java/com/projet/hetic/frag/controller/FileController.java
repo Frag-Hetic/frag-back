@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class FileController {
     @PostMapping("/split")
@@ -20,7 +20,7 @@ public class FileController {
         return ResponseEntity.ok("hello");
     }
 
-    @PostMapping("unsplit/{fileId}")
+    @PostMapping("/unsplit/{fileId}")
     public ResponseEntity<String> unsplitFile(@PathVariable String fileId) {
         return ResponseEntity.ok("supp");
     }
