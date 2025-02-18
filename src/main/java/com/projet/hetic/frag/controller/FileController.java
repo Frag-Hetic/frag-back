@@ -1,6 +1,5 @@
 package com.projet.hetic.frag.controller;
 
-import com.projet.hetic.frag.dto.FileResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +22,5 @@ public class FileController {
     public ResponseEntity<String> unsplitFile(@PathVariable String fileId) {
         return ResponseEntity.ok("supp");
     }
-
 
 }
