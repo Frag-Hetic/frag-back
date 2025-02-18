@@ -20,25 +20,27 @@ public class Chunk {
   @Column(length = 64, nullable = false, unique = true)
   private String hash;
 
-  @Column(nullable = false)
+  @Column(nullable = false, name = "size_original")
   private Integer sizeOriginal;
 
-  @Column(nullable = false)
+  @Column(nullable = false, name = "size_compressed")
   private Integer sizeCompressed;
 
   @Column(nullable = false)
   @Lob
   private byte[] data;
 
-  @Column(length = 10, nullable = false)
+  @Column(length = 10, nullable = false, name = "compression_type")
   private String compressionType;
 
   @OneToMany(mappedBy = "chunk", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<FilesChunks> filesChunks;
 
   @CreationTimestamp
+  @Column(name = "created_at")
   private LocalDateTime createdAt;
 
   @UpdateTimestamp
+  @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 }
