@@ -34,7 +34,7 @@ public class Chunk {
   private String compressionType;
 
   @OneToMany(mappedBy = "chunk", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<FilesChunks> filesChunks;
+  private List<FileChunk> filesChunks;
 
   @CreationTimestamp
   @Column(name = "created_at")

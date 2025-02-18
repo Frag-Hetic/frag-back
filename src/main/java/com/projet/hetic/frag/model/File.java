@@ -30,7 +30,7 @@ public class File {
   private String checkhash;
 
   @OneToMany(mappedBy = "file", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<FilesChunks> filesChunks;
+  private List<FileChunk> filesChunks;
 
   @CreationTimestamp
   @Column(name = "created_at")

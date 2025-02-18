@@ -15,7 +15,7 @@ import lombok.Data;
     @UniqueConstraint(name = "uq_file_id_chunk_order", columnNames = { "file_id", "chunk_order" }),
 })
 @Data
-public class FilesChunks {
+public class FileChunk {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
