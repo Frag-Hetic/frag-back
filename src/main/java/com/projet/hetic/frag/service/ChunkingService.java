@@ -3,55 +3,53 @@ package com.projet.hetic.frag.service;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 import org.rabinfingerprint.fingerprint.RabinFingerprintLongWindowed;
 import org.rabinfingerprint.polynomial.Polynomial;
 
 public class ChunkingService {
-  private static final int CHUNK_SIZE = 1024 * 8; // Taille de chunk approximative (8KB)
-  private static final int POLYNOMIAL = 5; // Exemple de polynôme
+
+  private static final int CHUNK_SIZE = 1024 * 8; // Taille approximative de 8KB
+  private static final int POLYNOMIAL = 5; // Polynôme utilisé pour l'algorithme Rabin
 
   public Stream<byte[]> chunkFile(InputStream inputStream) {
-    List<byte[]> chunks = new ArrayList<>();
-    RabinFingerprintLongWindowed rabin = new RabinFingerprintLongWindowed(
-        Polynomial.createIrreducible(POLYNOMIAL), 3);
-
-    try (BufferedInputStream bis = new BufferedInputStream(inputStream)) {
-      byte[] buffer = new byte[CHUNK_SIZE];
+    return Stream.generate(() -> {
+      RabinFingerprintLongWindowed rabin = new RabinFingerprintLongWindowed(
+          Polynomial.createIrreducible(POLYNOMIAL), 3); // Crée l'empreinte Rabin avec une fenêtre de taille 3
       ByteArrayOutputStream currentChunk = new ByteArrayOutputStream();
-      int bytesRead;
+      try {
+        BufferedInputStream bis = new BufferedInputStream(inputStream);
+        byte[] buffer = new byte[CHUNK_SIZE];
+        int bytesRead;
 
-      // Lecture des données et détection des frontières
-      while ((bytesRead = bis.read(buffer)) != -1) {
-        for (int i = 0; i < bytesRead; i++) {
-          byte b = buffer[i];
-          rabin.pushByte(b); // Mettre à jour le hachage Rabin
+        // Lecture des données à partir du fichier
+        while ((bytesRead = bis.read(buffer)) != -1) {
+          for (int i = 0; i < bytesRead; i++) {
+            byte b = buffer[i];
+            rabin.pushByte(b); // Met à jour l'empreinte Rabin
+            currentChunk.write(b); // Ajoute l'octet au chunk actuel
 
-          // Ajouter l'octet au chunk actuel
-          currentChunk.write(b);
-
-          // Détecter la frontière basée sur le hachage
-          if (rabin.getFingerprintLong() % CHUNK_SIZE == 0) {
-            // Cloner le chunk actuel et l'ajouter à la liste des chunks
-            chunks.add(currentChunk.toByteArray());
-            currentChunk.reset(); // Réinitialiser pour le prochain chunk
+            // Détection de la frontière du chunk
+            if (rabin.getFingerprintLong() % CHUNK_SIZE == 0) {
+              byte[] chunk = currentChunk.toByteArray();
+              currentChunk.reset(); // Réinitialise le buffer pour le prochain chunk
+              return chunk; // Retourne le chunk immédiatement
+            }
           }
         }
+
+        // Si on a des données restantes, retourner un dernier chunk
+        if (currentChunk.size() > 0) {
+          byte[] finalChunk = currentChunk.toByteArray();
+          currentChunk.reset();
+          return finalChunk;
+        }
+
+      } catch (Exception e) {
+        e.printStackTrace();
       }
-
-      // Ajouter les données restantes (si non terminées à une frontière)
-      if (currentChunk.size() > 0) {
-        chunks.add(currentChunk.toByteArray());
-      }
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-    return chunks.stream();
+      return null; // Fin du flux
+    }).takeWhile(chunk -> chunk != null); // Arrêter quand il n'y a plus de chunks
   }
-
 }
