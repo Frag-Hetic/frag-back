@@ -15,25 +15,27 @@ import com.projet.hetic.frag.repository.UserRepository;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
-  public UserService(UserRepository userRepository) {
+  public UserService(UserRepository userRepository, UserMapper userMapper) {
     this.userRepository = userRepository;
+    this.userMapper = userMapper;
   }
 
   public List<UserOutputDto> getAllUsers() {
-    return userRepository.findAll().stream().map(UserMapper::toDTO).toList();
+    return userRepository.findAll().stream().map(userMapper::toDTO).toList();
   }
 
   public UserOutputDto getUserById(Long id) {
     return userRepository.findById(id)
-        .map(UserMapper::toDTO)
+        .map(userMapper::toDTO)
         .orElseThrow(() -> new UserNotFoundException(id));
   }
 
   public UserOutputDto createUser(UserInputDto userInputDto) {
-    User user = UserMapper.toEntity(userInputDto);
+    User user = userMapper.toEntity(userInputDto);
     User savedUser = userRepository.save(user);
-    return UserMapper.toDTO(savedUser);
+    return userMapper.toDTO(savedUser);
   }
 
   public UserOutputDto updateUser(Long id, UserInputDto userInputDto) {
@@ -41,7 +43,7 @@ public class UserService {
         .map(existingUser -> {
           existingUser.setName(userInputDto.getName());
           existingUser.setEmail(userInputDto.getEmail());
-          return UserMapper.toDTO(userRepository.save(existingUser));
+          return userMapper.toDTO(userRepository.save(existingUser));
         })
         .orElseThrow(() -> new UserNotFoundException(id));
   }
