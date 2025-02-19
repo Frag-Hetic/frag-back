@@ -1,6 +1,11 @@
 package com.projet.hetic.frag.service;
 
 import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class CompressionServiceTest {
@@ -25,5 +30,54 @@ class CompressionServiceTest {
         byte[] decompressedData = compressionService.decompressChunk(compressedData);
         assertNotNull(decompressedData, "La décompression ZLIB a échoué");
         assertArrayEquals(originalData, decompressedData, "Les données décompressées ne correspondent pas aux originales");
+    }
+
+    @Test
+    void testCompressionPerformance() {
+        byte[] data = new byte[10 * 1024 * 1024]; // 10MB de données
+
+        long startCompression = System.nanoTime();
+        byte[] compressedData = compressionService.compressChunk(data);
+        long endCompression = System.nanoTime();
+
+        long compressionTimeMs = (endCompression - startCompression) / 1_000_000;
+        System.out.println("Temps de compression pour 10MB : " + compressionTimeMs + " ms");
+
+        assertNotNull(compressedData);
+    }
+
+    @Test
+    void testDecompressionPerformance() {
+        byte[] data = new byte[10 * 1024 * 1024]; // 10MB de données
+        byte[] compressedData = compressionService.compressChunk(data);
+
+        long startDecompression = System.nanoTime();
+        byte[] decompressedData = compressionService.decompressChunk(compressedData);
+        long endDecompression = System.nanoTime();
+
+        long decompressionTimeMs = (endDecompression - startDecompression) / 1_000_000;
+        System.out.println("Temps de décompression pour 10MB : " + decompressionTimeMs + " ms");
+
+        assertNotNull(decompressedData);
+        assertEquals(data.length, decompressedData.length, "Les données décompressées doivent avoir la même taille que l'originale");
+    }
+
+    @Test
+    void testCompressionWithDifferentFileTypes() throws IOException {
+        byte[] textFile = Files.readAllBytes(Paths.get("src/test/resources/test.txt"));
+        byte[] imageFile = Files.readAllBytes(Paths.get("src/test/resources/test.png"));
+        byte[] binaryFile = Files.readAllBytes(Paths.get("src/test/resources/test.zip"));
+
+        byte[] compressedText = compressionService.compressChunk(textFile);
+        byte[] compressedImage = compressionService.compressChunk(imageFile);
+        byte[] compressedBinary = compressionService.compressChunk(binaryFile);
+
+        assertNotNull(compressedText);
+        assertNotNull(compressedImage);
+        assertNotNull(compressedBinary);
+
+        System.out.println("Taux de compression (Texte) : " + (compressedText.length * 100.0 / textFile.length) + "%");
+        System.out.println("Taux de compression (Image) : " + (compressedImage.length * 100.0 / imageFile.length) + "%");
+        System.out.println("Taux de compression (Binaire) : " + (compressedBinary.length * 100.0 / binaryFile.length) + "%");
     }
 }

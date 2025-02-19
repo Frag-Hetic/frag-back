@@ -1,0 +1,2 @@
+Ceci est un fichier texte pour tester le chunking.
+Il contient plusieurs lignes pour voir comment le découpage fonctionne.
