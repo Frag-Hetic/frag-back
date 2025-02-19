@@ -7,15 +7,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.projet.hetic.frag.model.File;
-import com.projet.hetic.frag.service.ChunkingService;
+import com.projet.hetic.frag.service.FileProcessingService;
 import com.projet.hetic.frag.service.FileService;
 
 @RestController
 @RequestMapping("/files")
 public class FileController {
     private final FileService fileService;
+    private final FileProcessingService fileProcessingService;
 
-    public FileController(FileService fileService, ChunkingService chunkingService) {
+    public FileController(FileService fileService, FileProcessingService fileProcessingService) {
+        this.fileProcessingService = fileProcessingService;
         this.fileService = fileService;
     }
 
@@ -27,8 +29,7 @@ public class FileController {
 
     @PostMapping("/split")
     public ResponseEntity<File> splitFile(@RequestParam("file") MultipartFile multipartFile) {
-        File file = fileService.createFile(multipartFile);
-        fileService.processAndSplitFile(multipartFile);
+        File file = fileProcessingService.processAndSplitFile(multipartFile);
         return ResponseEntity.ok(file);
     }
 
