@@ -51,6 +51,6 @@ public class FileService {
   @Transactional(propagation = Propagation.REQUIRED)
   public File getFileById(Long id) {
     return fileRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("User", "id", id.toString()));
+        .orElseThrow(() -> new EntityNotFoundException("File", "id", id.toString()));
   }
 }
