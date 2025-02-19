@@ -46,4 +46,15 @@ public class FileService {
   public List<File> getAllFile() {
     return fileRepository.findAll();
   }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  public File getFileById(String fileId) {
+    Long id;
+    try {
+      id = Long.parseLong(fileId);
+    } catch (NumberFormatException e) {
+      throw new RuntimeException("Invalid file ID format", e);
+    }
+    return fileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found"));
+  }
 }

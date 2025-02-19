@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.service.FileProcessingService;
 import com.projet.hetic.frag.service.FileService;
@@ -39,8 +40,9 @@ public class FileController {
     }
 
     @PostMapping("/unsplit/{fileId}")
-    public ResponseEntity<String> unsplitFile(@PathVariable String fileId) {
-        return ResponseEntity.ok("supp");
+    public ResponseEntity<FileDownloadDTO> unsplitFile(@PathVariable String fileId) {
+        FileDownloadDTO file = fileProcessingService.processAndUnsplitFile(fileId);
+        return ResponseEntity.ok(file);
     }
 
 }
