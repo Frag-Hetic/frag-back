@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,7 +17,7 @@ import lombok.Data;
     @UniqueConstraint(name = "uq_file_id_chunk_order", columnNames = { "file_id", "chunk_order" }),
 })
 @Data
-public class FilesChunks {
+public class FileChunk {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +25,12 @@ public class FilesChunks {
 
   @ManyToOne
   @JoinColumn(name = "file_id", nullable = false)
+  @JsonBackReference
   private File file;
 
   @ManyToOne
   @JoinColumn(name = "chunk_id", nullable = false)
+  @JsonBackReference
   private Chunk chunk;
 
   @Column(nullable = false, name = "chunk_order")

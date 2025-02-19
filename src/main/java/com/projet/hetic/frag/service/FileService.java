@@ -19,7 +19,7 @@ public class FileService {
   private final FileRepository fileRepository;
 
   public FileService(FileMapper fileMapper, HashingService hashingService, FileRepository fileRepository,
-      ChunkingService chunkingService, ChunkService chunkService) {
+      ChunkingService chunkingService, ChunkService chunkService, FileChunkService fileChunkService) {
     this.fileMapper = fileMapper;
     this.hashingService = hashingService;
     this.fileRepository = fileRepository;
@@ -46,5 +46,4 @@ public class FileService {
   public List<File> getAllFile() {
     return fileRepository.findAll();
   }
-
 }
