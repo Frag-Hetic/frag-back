@@ -26,7 +26,7 @@ public class ChunkService {
   @Transactional(propagation = Propagation.REQUIRED)
   public Chunk findOrCreateChunk(byte[] bytes) {
     byte[] compressedBytes = compressionService.compressChunk(bytes);
-    String hash = hashingService.calculateSHA256(compressedBytes);
+    String hash = hashingService.hashAndCrypt64(compressedBytes);
 
     return chunkRepository.findByHash(hash)
         .orElseGet(() -> {

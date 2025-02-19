@@ -43,7 +43,7 @@ public class FileService {
       throw new RuntimeException("Failed to read multipart file", e);
     }
 
-    String hash = hashingService.calculateSHA256(bytes);
+    String hash = hashingService.hashAndCrypt64(bytes);
     file.setCheckhash(hash);
 
     return fileRepository.save(file);
