@@ -35,6 +35,10 @@ class FileProcessingServiceTest {
   private ChunkService chunkService;
   @Mock
   private FileChunkService fileChunkService;
+  @Mock
+  private CompressionService compressionService;
+  @Mock
+  private HashingService hashingService;
 
   private FileProcessingService fileProcessingService;
 
@@ -44,7 +48,7 @@ class FileProcessingServiceTest {
         fileService,
         chunkingService,
         chunkService,
-        fileChunkService);
+        fileChunkService, compressionService, hashingService);
   }
 
   @Test

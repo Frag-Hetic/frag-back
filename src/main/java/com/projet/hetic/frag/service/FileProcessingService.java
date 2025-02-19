@@ -25,15 +25,18 @@ public class FileProcessingService {
   private final ChunkService chunkService;
   private final FileChunkService fileChunkService;
   private final CompressionService compressionService;
+  private final HashingService hashingService;
 
   public FileProcessingService(FileService fileService,
       ChunkingService chunkingService,
-      ChunkService chunkService, FileChunkService fileChunkService, CompressionService compressionService) {
+      ChunkService chunkService, FileChunkService fileChunkService, CompressionService compressionService,
+      HashingService hashingService) {
     this.fileService = fileService;
     this.chunkingService = chunkingService;
     this.chunkService = chunkService;
     this.fileChunkService = fileChunkService;
     this.compressionService = compressionService;
+    this.hashingService = hashingService;
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
@@ -73,11 +76,17 @@ public class FileProcessingService {
       // Reconstruct file content
       try (ByteArrayOutputStream fileContent = new ByteArrayOutputStream()) {
         for (FileChunk fileChunk : fileChunks) {
-          System.out.println("Processing chunk: " + fileChunk.getChunk().getId());
           Chunk chunk = fileChunk.getChunk();
           byte[] compressedData = chunk.getData();
           byte[] uncompressedData = compressionService.decompressChunk(compressedData);
           fileContent.write(uncompressedData);
+        }
+
+        // Compare file hash and new fileContent hash
+        byte[] fileContentBytes = fileContent.toByteArray();
+        String fileContentHash = hashingService.hashAndCrypt64(fileContentBytes);
+        if (!fileContentHash.equals(file.getCheckhash())) {
+          throw new FileProcessingException("File content hash mismatch");
         }
 
         // Return the reconstructed file
