@@ -7,7 +7,9 @@ import java.util.stream.Stream;
 
 import org.rabinfingerprint.fingerprint.RabinFingerprintLongWindowed;
 import org.rabinfingerprint.polynomial.Polynomial;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ChunkingService {
 
   private static final int CHUNK_SIZE = 1024 * 8; // Taille approximative de 8KB

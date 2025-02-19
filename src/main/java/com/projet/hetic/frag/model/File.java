@@ -23,7 +23,7 @@ public class File {
   @Column(nullable = false, name = "file_size")
   private Long fileSize;
 
-  @Column(name = "mime_type", length = 150, unique = true, nullable = false)
+  @Column(name = "mime_type", length = 150, nullable = false)
   private String mimeType;
 
   @Column(length = 64, nullable = false, name = "check_hash")
