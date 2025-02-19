@@ -1,6 +1,9 @@
 package com.projet.hetic.frag.service;
 
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class CompressionServiceTest {
@@ -25,5 +28,19 @@ class CompressionServiceTest {
         byte[] decompressedData = compressionService.decompressChunk(compressedData);
         assertNotNull(decompressedData, "La décompression ZLIB a échoué");
         assertArrayEquals(originalData, decompressedData, "Les données décompressées ne correspondent pas aux originales");
+    }
+
+    @Test
+    void testTotalCompressedSize() {
+        byte[] originalData1 = "Hello Frag! Hello Frag! Hello Frag! Hello Frag!".getBytes();
+        byte[] originalData2 = "Data compression is important!".getBytes();
+
+        byte[] compressed1 = compressionService.compressChunk(originalData1);
+        byte[] compressed2 = compressionService.compressChunk(originalData2);
+
+        int totalCompressedSize = compressionService.getTotalCompressedSize(List.of(compressed1, compressed2));
+
+        assertTrue(totalCompressedSize < (originalData1.length + originalData2.length),
+                "La taille compressée totale devrait être inférieure à la somme des tailles originales");
     }
 }
