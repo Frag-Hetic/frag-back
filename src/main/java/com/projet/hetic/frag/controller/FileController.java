@@ -53,7 +53,7 @@ public class FileController {
     }
 
     @GetMapping("/unsplit/{fileId}")
-    public ResponseEntity<byte[]> unsplitFile(@PathVariable String fileId) {
+    public ResponseEntity<byte[]> unsplitFile(@PathVariable Long fileId) {
         FileDownloadDTO file = fileProcessingService.processAndUnsplitFile(fileId);
 
         HttpHeaders headers = new HttpHeaders();

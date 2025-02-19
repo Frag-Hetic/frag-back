@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.projet.hetic.frag.exception.EntityNotFoundException;
 import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.repository.FileRepository;
@@ -49,13 +48,7 @@ public class FileService {
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
-  public File getFileById(String fileId) {
-    Long id;
-    try {
-      id = Long.parseLong(fileId);
-    } catch (NumberFormatException e) {
-      throw new RuntimeException("Invalid file ID format", e);
-    }
-    return fileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found"));
+  public File getFileById(Long fileId) {
+    return fileRepository.findById(fileId).orElseThrow(() -> new RuntimeException("File not found"));
   }
 }

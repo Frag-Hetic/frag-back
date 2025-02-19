@@ -57,20 +57,12 @@ public class FileProcessingService {
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
-  public FileDownloadDTO processAndUnsplitFile(String fileId) {
+  public FileDownloadDTO processAndUnsplitFile(Long fileId) {
     try {
       File file = fileService.getFileById(fileId);
 
-      // Convert fileId from String to Long
-      Long id;
-      try {
-        id = Long.parseLong(fileId);
-      } catch (NumberFormatException e) {
-        throw new FileProcessingException("Invalid file ID format: " + fileId);
-      }
-
       // Retrieve sorted file chunks
-      List<FileChunk> fileChunks = fileChunkService.getFileChunkByFile(id);
+      List<FileChunk> fileChunks = fileChunkService.getFileChunkByFile(fileId);
 
       if (fileChunks.isEmpty()) {
         throw new FileProcessingException("No chunks found for file ID: " + fileId);
