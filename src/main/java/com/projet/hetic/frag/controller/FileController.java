@@ -1,7 +1,12 @@
 package com.projet.hetic.frag.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +15,8 @@ import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.service.FileProcessingService;
 import com.projet.hetic.frag.service.FileService;
+
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/files")
@@ -39,10 +46,19 @@ public class FileController {
         return ResponseEntity.ok("hello");
     }
 
-    @PostMapping("/unsplit/{fileId}")
-    public ResponseEntity<FileDownloadDTO> unsplitFile(@PathVariable String fileId) {
+    @GetMapping("/unsplit/{fileId}")
+    public ResponseEntity<byte[]> unsplitFile(@PathVariable String fileId) {
         FileDownloadDTO file = fileProcessingService.processAndUnsplitFile(fileId);
-        return ResponseEntity.ok(file);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(file.getMimeType()));
+        try {
+            String encodedFilename = URLEncoder.encode(file.getFilename(), StandardCharsets.UTF_8.toString());
+            headers.setContentDispositionFormData("attachment", encodedFilename); // Use "inline" for display
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Failed to encode filename", e);
+        }
+        return new ResponseEntity<>(file.getFileContent(), headers, HttpStatus.OK);
     }
 
 }

@@ -5,12 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import com.projet.hetic.frag.model.Chunk;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ChunkRepository extends JpaRepository<Chunk, Long> {
   Optional<Chunk> findByHash(String hash);
-
-  List<Chunk> findByFileIdOrderByChunkOrderAsc(String fileId);
 }

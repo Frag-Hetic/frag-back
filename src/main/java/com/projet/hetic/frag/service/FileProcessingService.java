@@ -16,6 +16,7 @@ import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.exception.FileProcessingException;
 import com.projet.hetic.frag.model.Chunk;
 import com.projet.hetic.frag.model.File;
+import com.projet.hetic.frag.model.FileChunk;
 
 @Service
 public class FileProcessingService {
@@ -60,17 +61,35 @@ public class FileProcessingService {
     try {
       File file = fileService.getFileById(fileId);
 
-      // The chunks are already sorted by order in the repo
-      List<Chunk> fileChunks = chunkService.getChunksByFile(fileId);
+      // Convert fileId from String to Long
+      Long id;
+      try {
+        id = Long.parseLong(fileId);
+      } catch (NumberFormatException e) {
+        throw new FileProcessingException("Invalid file ID format: " + fileId);
+      }
 
+      // Retrieve sorted file chunks
+      List<FileChunk> fileChunks = fileChunkService.getFileChunkByFile(id);
+
+      if (fileChunks.isEmpty()) {
+        throw new FileProcessingException("No chunks found for file ID: " + fileId);
+      }
+      // Reconstruct file content
       try (ByteArrayOutputStream fileContent = new ByteArrayOutputStream()) {
-        for (Chunk chunk : fileChunks) {
-          byte[] uncompressedData = compressionService.decompressChunk(chunk.getData());
-          fileContent.write(uncompressedData); // Append decompressed chunk
+        for (FileChunk fileChunk : fileChunks) {
+          System.out.println("Processing chunk: " + fileChunk.getChunk().getId());
+          Chunk chunk = fileChunk.getChunk();
+          byte[] compressedData = chunk.getData();
+          byte[] uncompressedData = compressionService.decompressChunk(compressedData);
+          fileContent.write(uncompressedData);
         }
-        return new FileDownloadDTO(file.getFilename(), fileContent.toByteArray(), file.getMimeType());
+
+        // Return the reconstructed file
+        return new FileDownloadDTO(file.getFilename(), file.getMimeType(), fileContent.toByteArray());
+
       } catch (IOException e) {
-        throw new FileProcessingException("Error processing file: " + e.getMessage());
+        throw new FileProcessingException("Error reconstructing file: " + e.getMessage());
       }
 
     } catch (RuntimeException e) {
