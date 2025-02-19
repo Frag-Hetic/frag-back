@@ -35,6 +35,12 @@ public class FileController {
         return ResponseEntity.ok(files);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<File> getFileById(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                fileService.getFileById(id));
+    }
+
     @PostMapping("/split")
     public ResponseEntity<File> splitFile(@RequestParam("file") MultipartFile multipartFile) {
         File file = fileProcessingService.processAndSplitFile(multipartFile);
