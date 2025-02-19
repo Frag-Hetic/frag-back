@@ -46,4 +46,9 @@ public class FileService {
   public List<File> getAllFile() {
     return fileRepository.findAll();
   }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  public File updateFile(File file) {
+    return fileRepository.save(file);
+  }
 }

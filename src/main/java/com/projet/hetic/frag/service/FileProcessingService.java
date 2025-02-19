@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import com.projet.hetic.frag.repository.FileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,31 +20,36 @@ public class FileProcessingService {
   private final ChunkingService chunkingService;
   private final ChunkService chunkService;
   private final FileChunkService fileChunkService;
+  private final FileRepository fileRepository;
 
   public FileProcessingService(FileService fileService,
-      ChunkingService chunkingService,
-      ChunkService chunkService, FileChunkService fileChunkService) {
+                               ChunkingService chunkingService,
+                               ChunkService chunkService, FileChunkService fileChunkService, FileRepository fileRepository) {
     this.fileService = fileService;
     this.chunkingService = chunkingService;
     this.chunkService = chunkService;
     this.fileChunkService = fileChunkService;
+    this.fileRepository = fileRepository;
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
   public File processAndSplitFile(MultipartFile multipartFile) {
-    File file = fileService.createFile(multipartFile);
+    File tempFile = fileService.createFile(multipartFile);
 
     try {
       AtomicInteger order = new AtomicInteger(0);
       AtomicInteger offsetStart = new AtomicInteger(0);
+      AtomicInteger totalSizeCompressed = new AtomicInteger(0);
       InputStream inputStream = multipartFile.getInputStream();
       Stream<byte[]> chunks = chunkingService.chunkFile(inputStream);
       chunks.map(chunk -> chunkService.findOrCreateChunk(chunk)).forEach(chunk -> {
-        fileChunkService.createFileChunk(file, chunk, order.get(), offsetStart.get());
+        fileChunkService.createFileChunk(tempFile, chunk, order.get(), offsetStart.get());
         order.getAndIncrement();
         offsetStart.addAndGet(chunk.getSizeOriginal());
+        totalSizeCompressed.addAndGet(chunk.getSizeCompressed());
       });
-      return file;
+      tempFile.setCompressedFileSize(totalSizeCompressed.longValue());
+      return fileService.updateFile(tempFile);
     } catch (IOException e) {
       throw new FileProcessingException(e.getMessage());
     }

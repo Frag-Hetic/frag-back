@@ -19,6 +19,7 @@ public class FileMapper {
     public File multipartToEntity(MultipartFile multipartFile) {
         File file = new File();
         file.setFileSize(multipartFile.getSize());
+        file.setCompressedFileSize(0L);
         file.setFilename(multipartFile.getOriginalFilename());
         file.setMimeType(multipartFile.getContentType());
         return file;
