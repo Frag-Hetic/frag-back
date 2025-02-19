@@ -16,12 +16,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.service.FileProcessingService;
 import com.projet.hetic.frag.service.FileService;
@@ -41,6 +43,7 @@ public class FileControllerTest {
   private File testFile1;
   private File testFile2;
   private MockMultipartFile multipartMock;
+  private FileDownloadDTO fileDownloadDTO;
 
   @BeforeEach
   void setUp() {
@@ -54,6 +57,11 @@ public class FileControllerTest {
 
     multipartMock = new MockMultipartFile(
         "file",
+        "test1.txt",
+        MediaType.TEXT_PLAIN_VALUE,
+        "Hello, World!".getBytes());
+
+    fileDownloadDTO = new FileDownloadDTO(
         "test1.txt",
         MediaType.TEXT_PLAIN_VALUE,
         "Hello, World!".getBytes());
@@ -119,15 +127,23 @@ public class FileControllerTest {
   }
 
   @Test
-  void unsplitFile_ShouldReturnSuccessMessage() {
+  void unsplitFile_ShouldReturnFileContent() {
     // Arrange
-    String fileId = "testFileId";
+    when(fileProcessingService.processAndUnsplitFile(1L))
+        .thenReturn(fileDownloadDTO);
 
     // Act
-    ResponseEntity<String> response = fileController.unsplitFile(fileId);
+    ResponseEntity<byte[]> response = fileController.unsplitFile(1L);
 
     // Assert
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getBody()).isEqualTo("supp");
+    assertThat(response.getHeaders().getContentType())
+        .isEqualTo(MediaType.TEXT_PLAIN);
+    assertThat(response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION))
+        .contains("filename=\"test1.txt\"");
+    assertThat(response.getBody())
+        .isEqualTo("Hello, World!".getBytes());
+
+    verify(fileProcessingService).processAndUnsplitFile(1L);
   }
 }
