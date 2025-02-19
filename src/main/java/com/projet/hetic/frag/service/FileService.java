@@ -19,8 +19,7 @@ public class FileService {
   private final HashingService hashingService;
   private final FileRepository fileRepository;
 
-  public FileService(FileMapper fileMapper, HashingService hashingService, FileRepository fileRepository,
-      ChunkingService chunkingService, ChunkService chunkService, FileChunkService fileChunkService) {
+  public FileService(FileMapper fileMapper, HashingService hashingService, FileRepository fileRepository) {
     this.fileMapper = fileMapper;
     this.hashingService = hashingService;
     this.fileRepository = fileRepository;
