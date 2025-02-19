@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.exception.EntityNotFoundException;
 import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.repository.FileRepository;
@@ -50,5 +51,11 @@ public class FileService {
   @Transactional(propagation = Propagation.REQUIRED)
   public File updateFile(File file) {
     return fileRepository.save(file);
+  }
+  
+  @Transactional(propagation = Propagation.REQUIRED)
+  public File getFileById(Long id) {
+    return fileRepository.findById(id)
+        .orElseThrow(() -> new EntityNotFoundException("File", "id", id.toString()));
   }
 }
