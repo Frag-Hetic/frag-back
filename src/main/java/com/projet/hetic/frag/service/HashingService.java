@@ -10,7 +10,7 @@ import com.projet.hetic.frag.exception.EntityNotFoundException;
 @Service
 public class HashingService {
 
-  public String calculateSHA256(byte[] bitesArray) {
+  public String hashAndCrypt64(byte[] bitesArray) {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
       byte[] hash = digest.digest(bitesArray);
