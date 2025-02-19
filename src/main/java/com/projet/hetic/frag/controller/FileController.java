@@ -3,6 +3,7 @@ package com.projet.hetic.frag.controller;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
@@ -44,7 +45,8 @@ public class FileController {
     @PostMapping("/split")
     public ResponseEntity<File> splitFile(@RequestParam("file") MultipartFile multipartFile) {
         File file = fileProcessingService.processAndSplitFile(multipartFile);
-        return ResponseEntity.ok(file);
+        URI location = URI.create(String.format("/files/%d", file.getId()));
+        return ResponseEntity.created(location).body(file);
     }
 
     @GetMapping("/chunks")

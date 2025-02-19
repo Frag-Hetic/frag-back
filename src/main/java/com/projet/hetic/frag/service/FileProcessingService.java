@@ -39,6 +39,8 @@ public class FileProcessingService {
   @Transactional(propagation = Propagation.REQUIRED)
   public File processAndSplitFile(MultipartFile multipartFile) {
     File file = fileService.createFile(multipartFile);
+    System.out.println("Segment " + file.getId() + ": size -> "
+        + new String(file.getFileSize() + " bytes, compressed size -> "));
 
     try {
       AtomicInteger order = new AtomicInteger(0);
@@ -46,7 +48,8 @@ public class FileProcessingService {
       InputStream inputStream = multipartFile.getInputStream();
       Stream<byte[]> chunks = chunkingService.chunkFile(inputStream);
       chunks.map(chunk -> chunkService.findOrCreateChunk(chunk)).forEach(chunk -> {
-        fileChunkService.createFileChunk(file, chunk, order.get(), offsetStart.get());
+        fileChunkService.createFileChunk(file, chunk, order.get(),
+            offsetStart.get());
         order.getAndIncrement();
         offsetStart.addAndGet(chunk.getSizeOriginal());
       });

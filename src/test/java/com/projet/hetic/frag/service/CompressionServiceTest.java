@@ -1,29 +1,84 @@
 package com.projet.hetic.frag.service;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.junit.jupiter.api.BeforeEach;
 
 class CompressionServiceTest {
 
-    private final CompressionService compressionService = new CompressionService();
+    private CompressionService compressionService;
+
+    @BeforeEach
+    void setUp() {
+        compressionService = new CompressionService();
+    }
 
     @Test
-    void testCompressionAndDecompressionZlib() {
-        // Données originales
-        String testData = "  \n" +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam posuere luctus mauris, eu vehicula sapien varius et. In varius cursus hendrerit. Nam non mattis dolor, eu interdum lorem. Integer maximus feugiat tortor et efficitur. Integer suscipit, orci id eleifend laoreet, diam nisl eleifend lacus, luctus scelerisque massa libero vitae ex. Aenean vel turpis magna. Curabitur a lectus eu mauris tristique pharetra. Pellentesque auctor eleifend quam, tincidunt imperdiet velit consequat sed. Mauris iaculis purus quis purus condimentum sagittis. Phasellus vel faucibus metus. Sed tempus lorem vel malesuada vehicula. Aenean accumsan, justo ut interdum molestie, leo nulla interdum diam, ut rutrum libero lectus vitae libero. Phasellus dictum viverra dignissim. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec ullamcorper risus vitae urna facilisis, id facilisis risus cursus.\n" +
-                "\n" +
-                "Sed vitae laoreet turpis, at luctus velit. Pellentesque dapibus fringilla velit, nec mattis mi tincidunt sit amet. Pellentesque ac enim at turpis hendrerit luctus eu id dui. Duis aliquam neque ut diam volutpat, ut tempor tortor sollicitudin. Aenean fringilla mi ut nibh orci.";
-        byte[] originalData = testData.getBytes();
+    void compressChunk_ShouldCompressData() {
+        // Arrange
+        String testString = "Test string with repeating content. ".repeat(100);
+        byte[] originalData = testString.getBytes();
 
-        // Compression
+        // Act
         byte[] compressedData = compressionService.compressChunk(originalData);
-        assertNotNull(compressedData, "La compression ZLIB a échoué");
-        assertTrue(compressedData.length < originalData.length, "La taille compressée doit être inférieure à la taille originale");
 
-        // Décompression
+        // Assert
+        assertThat(compressedData.length).isLessThan(originalData.length);
+    }
+
+    @Test
+    void decompressChunk_ShouldRestoreOriginalData() {
+        // Arrange
+        String testString = "Test string that should be compressed and decompressed";
+        byte[] originalData = testString.getBytes();
+
+        // Act
+        byte[] compressedData = compressionService.compressChunk(originalData);
         byte[] decompressedData = compressionService.decompressChunk(compressedData);
-        assertNotNull(decompressedData, "La décompression ZLIB a échoué");
-        assertArrayEquals(originalData, decompressedData, "Les données décompressées ne correspondent pas aux originales");
+
+        // Assert
+        assertThat(decompressedData).isEqualTo(originalData);
+    }
+
+    @Test
+    void compressChunk_ShouldHandleEmptyArray() {
+        // Arrange
+        byte[] emptyData = new byte[0];
+
+        // Act
+        byte[] compressedData = compressionService.compressChunk(emptyData);
+        byte[] decompressedData = compressionService.decompressChunk(compressedData);
+
+        // Assert
+        assertThat(decompressedData).isEmpty();
+    }
+
+    @Test
+    void compressChunk_ShouldHandleLargeData() {
+        // Arrange
+        byte[] largeData = new byte[1024 * 1024]; // 1MB de données
+        for (int i = 0; i < largeData.length; i++) {
+            largeData[i] = (byte) (i % 256);
+        }
+
+        // Act
+        byte[] compressedData = compressionService.compressChunk(largeData);
+        byte[] decompressedData = compressionService.decompressChunk(compressedData);
+
+        // Assert
+        assertThat(decompressedData).isEqualTo(largeData);
+    }
+
+    @Test
+    void decompressChunk_ShouldThrowException_WhenDataIsInvalid() {
+        // Arrange
+        byte[] invalidData = "Invalid compressed data".getBytes();
+
+        // Act & Assert
+        assertThatThrownBy(() -> compressionService.decompressChunk(invalidData))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Erreur lors de la décompression");
     }
 }
