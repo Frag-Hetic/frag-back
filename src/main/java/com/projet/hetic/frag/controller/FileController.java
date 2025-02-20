@@ -53,11 +53,6 @@ public class FileController {
         return ResponseEntity.created(location).body(file);
     }
 
-    @GetMapping("/chunks")
-    public ResponseEntity<String> getChunks(@RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok("hello");
-    }
-
     @GetMapping("/unsplit/{fileId}")
     public ResponseEntity<byte[]> unsplitFile(@PathVariable Long fileId) {
         FileDownloadDTO file = fileProcessingService.processAndUnsplitFile(fileId);
