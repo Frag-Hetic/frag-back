@@ -1,5 +1,7 @@
 package com.projet.hetic.frag.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,15 @@ public class FileChunkService {
     fileChunk.setChunkOrder(order);
     fileChunk.setOffsetStart(offsetStart);
     return fileChunkRepository.save(fileChunk);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  public List<FileChunk> getFileChunkByFile(Long fileId) {
+    List<FileChunk> fileChunks = fileChunkRepository.findByFileIdOrderByChunkOrderAsc(fileId);
+    if (fileChunks.isEmpty()) {
+      return null;
+    }
+    return fileChunks;
   }
 
 }

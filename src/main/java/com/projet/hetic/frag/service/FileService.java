@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.exception.EntityNotFoundException;
 import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.repository.FileRepository;
@@ -18,8 +19,7 @@ public class FileService {
   private final HashingService hashingService;
   private final FileRepository fileRepository;
 
-  public FileService(FileMapper fileMapper, HashingService hashingService, FileRepository fileRepository,
-      ChunkingService chunkingService, ChunkService chunkService, FileChunkService fileChunkService) {
+  public FileService(FileMapper fileMapper, HashingService hashingService, FileRepository fileRepository) {
     this.fileMapper = fileMapper;
     this.hashingService = hashingService;
     this.fileRepository = fileRepository;
@@ -45,5 +45,12 @@ public class FileService {
   @Transactional(propagation = Propagation.REQUIRED)
   public List<File> getAllFile() {
     return fileRepository.findAll();
+  }
+
+  @Transactional(propagation = Propagation.REQUIRED)
+  public File getFileById(Long fileId) {
+    return fileRepository.findById(fileId)
+        .orElseThrow(() -> new EntityNotFoundException("File", "id", fileId.toString()));
+
   }
 }
