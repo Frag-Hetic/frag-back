@@ -57,7 +57,7 @@ public class FileProcessingService {
       });
       return file;
     } catch (IOException e) {
-      throw new FileProcessingException("Fail unsplit: " + e.getMessage());
+      throw new FileProcessingException("Fail split: " + e.getMessage());
     }
   }
 
