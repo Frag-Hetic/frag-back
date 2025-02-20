@@ -8,7 +8,7 @@ import com.projet.hetic.frag.model.Chunk;
 import lombok.Getter;
 
 @Getter
-public class ProcessingStats {
+public class ProcessingStatsUtils {
   private final AtomicInteger order = new AtomicInteger(0);
   private final AtomicInteger offset = new AtomicInteger(0);
   private final AtomicLong totalCompressedSize = new AtomicLong(0);

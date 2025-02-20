@@ -10,7 +10,7 @@ import com.projet.hetic.frag.dto.ChunkingParamsDto;
 import com.projet.hetic.frag.exception.FileProcessingException;
 import com.projet.hetic.frag.model.Chunk;
 import com.projet.hetic.frag.model.File;
-import com.projet.hetic.frag.utils.ProcessingStats;
+import com.projet.hetic.frag.utils.ProcessingStatsUtils;
 import com.projet.hetic.frag.utils.TimeUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class FileChunkProcessor {
 
   private void processFileChunks(InputStream inputStream, ChunkingService chunkingService,
       File tempFile, long startTime) {
-    var processingStats = new ProcessingStats();
+    var processingStats = new ProcessingStatsUtils();
 
     try {
       chunkingService.chunkFile(inputStream)
@@ -53,7 +53,7 @@ public class FileChunkProcessor {
     }
   }
 
-  private void processChunk(Chunk chunk, File tempFile, ProcessingStats stats) {
+  private void processChunk(Chunk chunk, File tempFile, ProcessingStatsUtils stats) {
     fileChunkService.createFileChunk(
         tempFile,
         chunk,
@@ -76,7 +76,7 @@ public class FileChunkProcessor {
     return tempConfig;
   }
 
-  private void updateFileStats(File tempFile, ProcessingStats stats, long startTime) {
+  private void updateFileStats(File tempFile, ProcessingStatsUtils stats, long startTime) {
     long processingTime = System.currentTimeMillis() - startTime;
     tempFile.setCompressedFileSize(stats.getTotalCompressedSize().get());
     tempFile.setProcessingTime(timeUtils.getFormattedProcessingTime(processingTime));
