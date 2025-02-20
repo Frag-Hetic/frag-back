@@ -31,6 +31,5 @@ public class FileMapper {
         fileDownloadDTO.setMimeType(file.getMimeType());
         fileDownloadDTO.setFileContent(fileContent);
         return fileDownloadDTO;
-
     }
 }
