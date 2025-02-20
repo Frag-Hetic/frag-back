@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.projet.hetic.frag.model.Chunk;
 
-class ProcessingStatsTest {
+class ProcessingStatsUtilsTest {
 
   private ProcessingStatsUtils stats;
   private Chunk mockChunk;
