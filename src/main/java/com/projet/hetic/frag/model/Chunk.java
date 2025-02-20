@@ -8,7 +8,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "chunk")
@@ -36,7 +36,7 @@ public class Chunk {
   private String compressionType;
 
   @OneToMany(mappedBy = "chunk", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonManagedReference
+  @JsonBackReference
   private List<FileChunk> filesChunks;
 
   @CreationTimestamp
