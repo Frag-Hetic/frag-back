@@ -18,6 +18,7 @@ import com.projet.hetic.frag.exception.FileProcessingException;
 import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.model.FileChunk;
+import com.projet.hetic.frag.utils.TimeUtils;
 
 @Service
 public class FileProcessingService {
@@ -28,11 +29,12 @@ public class FileProcessingService {
   private final HashingService hashingService;
   private final FileMapper fileMapper;
   private final ChunkingConfig defaultConfig; // Configuration par défaut
+  private final TimeUtils timeUtils; // Configuration par défaut
 
   public FileProcessingService(FileService fileService,
       ChunkService chunkService, FileChunkService fileChunkService,
       HashingService hashingService, FileMapper fileMapper, FileConstructionService fileConstructionService,
-      ChunkingConfig defaultConfig) {
+      ChunkingConfig defaultConfig, TimeUtils timeUtils) {
     this.fileService = fileService;
     this.chunkService = chunkService;
     this.fileChunkService = fileChunkService;
@@ -40,6 +42,7 @@ public class FileProcessingService {
     this.hashingService = hashingService;
     this.fileMapper = fileMapper;
     this.defaultConfig = defaultConfig;
+    this.timeUtils = timeUtils;
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
@@ -81,7 +84,7 @@ public class FileProcessingService {
       long processingTime = System.currentTimeMillis() - startTime;
 
       tempFile.setCompressedFileSize(totalSizeCompressed.longValue());
-      tempFile.setProcessingTime(processingTime);
+      tempFile.setProcessingTime(timeUtils.getFormattedProcessingTime(processingTime));
 
       return fileService.updateFile(tempFile);
     } catch (IOException e) {

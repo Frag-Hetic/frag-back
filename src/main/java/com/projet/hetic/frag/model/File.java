@@ -44,7 +44,7 @@ public class File {
   private String breakpointMask;
 
   @Column(name = "processing_time")
-  private Long processingTime;
+  private String processingTime;
 
   @Column(length = 64, nullable = false, name = "check_hash")
   private String checkhash;
