@@ -34,9 +34,11 @@ public class ChunkingService {
 
         // Vérifier la condition de découpage (empreinte divisible par
         // chunkBoundaryCondition)
-        if (window.getFingerprintLong() % 4096 == 0) {
+        if (window.getFingerprintLong() % 3 == 0) {
           // Ajouter le segment découpé à la liste
           segments.add(segmentBuffer.toByteArray());
+          // System.out.println("Segment -> " + new String(segmentBuffer.toByteArray()));
+          // System.out.println("Segment printing -> " + window.getFingerprintLong());
           // Réinitialiser le buffer pour le prochain segment
           segmentBuffer.reset();
         }

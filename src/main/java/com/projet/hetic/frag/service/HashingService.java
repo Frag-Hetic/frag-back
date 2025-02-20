@@ -5,7 +5,6 @@ import java.security.NoSuchAlgorithmException;
 
 import org.springframework.stereotype.Service;
 
-import com.projet.hetic.frag.exception.CompareHashException;
 import com.projet.hetic.frag.exception.EntityNotFoundException;
 
 @Service
@@ -25,11 +24,8 @@ public class HashingService {
     }
   }
 
-  public void compareConstructFileWithCheckHash(byte[] constructFile, String checkHash) {
+  public boolean compareConstructFileWithCheckHash(byte[] constructFile, String checkHash) {
     String fileContentHash = hashAndCrypt64(constructFile);
-    if (!fileContentHash.equals(checkHash)) {
-      throw new CompareHashException();
-
-    }
+    return fileContentHash.equals(checkHash);
   }
 }

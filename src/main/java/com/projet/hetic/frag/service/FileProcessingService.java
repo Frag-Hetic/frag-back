@@ -73,7 +73,9 @@ public class FileProcessingService {
       }
 
       byte[] fileContentBytes = fileConstructionService.reconstructFileFromChunks(fileChunks, fileId);
-      hashingService.compareConstructFileWithCheckHash(fileContentBytes, file.getCheckhash());
+      if (hashingService.compareConstructFileWithCheckHash(fileContentBytes, file.getCheckhash())) {
+        throw new RuntimeException("Hashes do not match");
+      }
 
       return fileMapper.toDownloadDTO(file, fileContentBytes);
     } catch (RuntimeException e) {
