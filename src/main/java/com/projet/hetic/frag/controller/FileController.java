@@ -12,10 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.dto.ChunkingParamsDto;
 import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.service.FileProcessingService;
 import com.projet.hetic.frag.service.FileService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.http.MediaType;
 
@@ -43,8 +46,10 @@ public class FileController {
     }
 
     @PostMapping("/split")
-    public ResponseEntity<File> splitFile(@RequestParam("file") MultipartFile multipartFile) {
-        File file = fileProcessingService.processAndSplitFile(multipartFile);
+    public ResponseEntity<File> splitFile(@RequestParam("file") MultipartFile multipartFile,
+            @ModelAttribute @Valid ChunkingParamsDto params) {
+
+        File file = fileProcessingService.processAndSplitFile(multipartFile, params);
         URI location = URI.create(String.format("/files/%d", file.getId()));
         return ResponseEntity.created(location).body(file);
     }

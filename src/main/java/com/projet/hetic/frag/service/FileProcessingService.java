@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.config.ChunkingConfig;
+import com.projet.hetic.frag.dto.ChunkingParamsDto;
 import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.exception.FileProcessingException;
 import com.projet.hetic.frag.mapper.FileMapper;
@@ -20,28 +22,44 @@ import com.projet.hetic.frag.model.FileChunk;
 @Service
 public class FileProcessingService {
   private final FileService fileService;
-  private final ChunkingService chunkingService;
   private final ChunkService chunkService;
   private final FileChunkService fileChunkService;
   private final FileConstructionService fileConstructionService;
   private final HashingService hashingService;
   private final FileMapper fileMapper;
+  private final ChunkingConfig defaultConfig; // Configuration par défaut
 
   public FileProcessingService(FileService fileService,
-      ChunkingService chunkingService,
       ChunkService chunkService, FileChunkService fileChunkService,
-      HashingService hashingService, FileMapper fileMapper, FileConstructionService fileConstructionService) {
+      HashingService hashingService, FileMapper fileMapper, FileConstructionService fileConstructionService,
+      ChunkingConfig defaultConfig) {
     this.fileService = fileService;
-    this.chunkingService = chunkingService;
     this.chunkService = chunkService;
     this.fileChunkService = fileChunkService;
     this.fileConstructionService = fileConstructionService;
     this.hashingService = hashingService;
     this.fileMapper = fileMapper;
+    this.defaultConfig = defaultConfig;
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
-  public File processAndSplitFile(MultipartFile multipartFile) {
+  public File processAndSplitFile(MultipartFile multipartFile, ChunkingParamsDto params) {
+
+    // Créer une configuration temporaire basée sur les paramètres
+    ChunkingConfig tempConfig = new ChunkingConfig();
+    if (params != null) {
+      tempConfig.setWindowSize(params.getWindowSize());
+      tempConfig.setChunkMinSize(params.getChunkMinSize());
+      tempConfig.setChunkMaxSize(params.getChunkMaxSize());
+      tempConfig.setBreakpointMask(params.getBreakpointMask());
+    } else {
+      tempConfig = defaultConfig;
+    }
+
+    System.out.println("tempConfig: " + tempConfig);
+
+    ChunkingService configuredChunkingService = new ChunkingService(tempConfig);
+
     File tempFile = fileService.createFile(multipartFile);
 
     try {
@@ -49,7 +67,7 @@ public class FileProcessingService {
       AtomicInteger offsetStart = new AtomicInteger(0);
       AtomicInteger totalSizeCompressed = new AtomicInteger(0);
       InputStream inputStream = multipartFile.getInputStream();
-      Stream<byte[]> chunks = chunkingService.chunkFile(inputStream);
+      Stream<byte[]> chunks = configuredChunkingService.chunkFile(inputStream);
       chunks.map(chunkService::findOrCreateChunk).forEach(chunk -> {
         fileChunkService.createFileChunk(tempFile, chunk, order.get(), offsetStart.get());
         order.getAndIncrement();

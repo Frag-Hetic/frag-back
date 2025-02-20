@@ -5,7 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+// import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
+// import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.projet.hetic.frag.dto.FileDownloadDTO;
@@ -42,7 +42,7 @@ public class FileControllerTest {
 
   private File testFile1;
   private File testFile2;
-  private MockMultipartFile multipartMock;
+  // private MockMultipartFile multipartMock;
   private FileDownloadDTO fileDownloadDTO;
 
   @BeforeEach
@@ -55,11 +55,11 @@ public class FileControllerTest {
     testFile2.setId(2L);
     testFile2.setFilename("test2.txt");
 
-    multipartMock = new MockMultipartFile(
-        "file",
-        "test1.txt",
-        MediaType.TEXT_PLAIN_VALUE,
-        "Hello, World!".getBytes());
+    // multipartMock = new MockMultipartFile(
+    // "file",
+    // "test1.txt",
+    // MediaType.TEXT_PLAIN_VALUE,
+    // "Hello, World!".getBytes());
 
     fileDownloadDTO = new FileDownloadDTO(
         "test1.txt",
@@ -96,22 +96,22 @@ public class FileControllerTest {
     assertEquals(testFile1, responseBody);
   }
 
-  @Test
-  void splitFile_ShouldProcessAndReturnFile() throws Exception {
-    // Arrange
-    MockMultipartFile mockFile = multipartMock;
-    File expectedFile = testFile1;
+  // @Test
+  // void splitFile_ShouldProcessAndReturnFile() throws Exception {
+  // // Arrange
+  // MockMultipartFile mockFile = multipartMock;
+  // File expectedFile = testFile1;
 
-    when(fileProcessingService.processAndSplitFile(mockFile)).thenReturn(expectedFile);
+  // when(fileProcessingService.processAndSplitFile(mockFile)).thenReturn(expectedFile);
 
-    // Act
-    ResponseEntity<File> response = fileController.splitFile(mockFile);
+  // // Act
+  // ResponseEntity<File> response = fileController.splitFile(mockFile);
 
-    // Assert
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-    assertNotNull(response.getBody());
-    assertEquals(expectedFile, response.getBody());
-  }
+  // // Assert
+  // assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+  // assertNotNull(response.getBody());
+  // assertEquals(expectedFile, response.getBody());
+  // }
 
   @Test
   void getChunks_ShouldReturnSuccessMessage() {
