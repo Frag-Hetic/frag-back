@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.exception.FileProcessingException;
+import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.Chunk;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.model.FileChunk;
@@ -26,24 +27,24 @@ public class FileProcessingService {
   private final FileChunkService fileChunkService;
   private final CompressionService compressionService;
   private final HashingService hashingService;
+  private final FileMapper fileMapper;
 
   public FileProcessingService(FileService fileService,
       ChunkingService chunkingService,
       ChunkService chunkService, FileChunkService fileChunkService, CompressionService compressionService,
-      HashingService hashingService) {
+      HashingService hashingService, FileMapper fileMapper) {
     this.fileService = fileService;
     this.chunkingService = chunkingService;
     this.chunkService = chunkService;
     this.fileChunkService = fileChunkService;
     this.compressionService = compressionService;
     this.hashingService = hashingService;
+    this.fileMapper = fileMapper;
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
   public File processAndSplitFile(MultipartFile multipartFile) {
     File file = fileService.createFile(multipartFile);
-    System.out.println("Segment " + file.getId() + ": size -> "
-        + new String(file.getFileSize() + " bytes, compressed size -> "));
 
     try {
       AtomicInteger order = new AtomicInteger(0);
@@ -73,6 +74,7 @@ public class FileProcessingService {
       if (fileChunks.isEmpty()) {
         throw new FileProcessingException("No chunks found for file ID: " + fileId);
       }
+
       // Reconstruct file content
       try (ByteArrayOutputStream fileContent = new ByteArrayOutputStream()) {
         for (FileChunk fileChunk : fileChunks) {
@@ -90,7 +92,7 @@ public class FileProcessingService {
         }
 
         // Return the reconstructed file
-        return new FileDownloadDTO(file.getFilename(), file.getMimeType(), fileContent.toByteArray());
+        return fileMapper.toDownloadDTO(file, fileContentBytes);
 
       } catch (IOException e) {
         throw new FileProcessingException("Error reconstructing file: " + e.getMessage());

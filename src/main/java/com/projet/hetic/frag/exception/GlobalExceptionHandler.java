@@ -22,6 +22,13 @@ public class GlobalExceptionHandler {
         .body(new ErrorResponseDto("error", ex.getMessage()));
   }
 
+  @ExceptionHandler(FileConstructionException.class)
+  public ResponseEntity<ErrorResponseDto> handleFileConstructionException(FileConstructionException ex) {
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(new ErrorResponseDto("error", ex.getMessage()));
+  }
+
   @ExceptionHandler(FileProcessingException.class)
   public ResponseEntity<ErrorResponseDto> handleFileProcessingException(FileProcessingException ex) {
     return ResponseEntity
