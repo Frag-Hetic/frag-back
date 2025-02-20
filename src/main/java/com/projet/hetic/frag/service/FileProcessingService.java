@@ -57,7 +57,7 @@ public class FileProcessingService {
       });
       return file;
     } catch (IOException e) {
-      throw new FileProcessingException(e.getMessage());
+      throw new FileProcessingException("Fail unsplit: " + e.getMessage());
     }
   }
 
@@ -65,8 +65,6 @@ public class FileProcessingService {
   public FileDownloadDTO processAndUnsplitFile(Long fileId) {
     try {
       File file = fileService.getFileById(fileId);
-
-      // Retrieve sorted file chunks
       List<FileChunk> fileChunks = fileChunkService.getFileChunkByFile(fileId);
 
       if (fileChunks.isEmpty()) {
@@ -75,16 +73,11 @@ public class FileProcessingService {
       }
 
       byte[] fileContentBytes = fileConstructionService.reconstructFileFromChunks(fileChunks, fileId);
-      String fileContentHash = hashingService.hashAndCrypt64(fileContentBytes);
-      if (!fileContentHash.equals(file.getCheckhash())) {
-        throw new FileProcessingException("File content hash mismatch");
-      }
+      hashingService.compareConstructFileWithCheckHash(fileContentBytes, file.getCheckhash());
 
-      // Return the reconstructed file
       return fileMapper.toDownloadDTO(file, fileContentBytes);
-
     } catch (RuntimeException e) {
-      throw new FileProcessingException("Failed to process file: " + e.getMessage());
+      throw new FileProcessingException("Fail unsplit: " + e.getMessage());
     }
   }
 }

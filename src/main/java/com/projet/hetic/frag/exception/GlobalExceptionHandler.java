@@ -29,6 +29,13 @@ public class GlobalExceptionHandler {
         .body(new ErrorResponseDto("error", ex.getMessage()));
   }
 
+  @ExceptionHandler(CompareHashException.class)
+  public ResponseEntity<ErrorResponseDto> handleCompareHashException(CompareHashException ex) {
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(new ErrorResponseDto("error", ex.getMessage()));
+  }
+
   @ExceptionHandler(FileProcessingException.class)
   public ResponseEntity<ErrorResponseDto> handleFileProcessingException(FileProcessingException ex) {
     return ResponseEntity
