@@ -4,7 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,6 +45,19 @@ public class FileController {
     public ResponseEntity<File> getFileById(@PathVariable Long id) {
         return ResponseEntity.ok(
                 fileService.getFileById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteFileById(@PathVariable Long id) {
+        boolean deleted = fileService.deleteFileById(id);
+
+        if (deleted) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "File deleted successfully");
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/split")

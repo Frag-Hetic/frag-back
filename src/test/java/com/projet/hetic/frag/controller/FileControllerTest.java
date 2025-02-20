@@ -1,15 +1,16 @@
 package com.projet.hetic.frag.controller;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 // import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+import com.projet.hetic.frag.repository.FileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +37,9 @@ public class FileControllerTest {
 
   @Mock
   private FileProcessingService fileProcessingService;
+
+  @Mock
+  private FileRepository fileRepository;
 
   @InjectMocks
   private FileController fileController;
@@ -146,4 +150,32 @@ public class FileControllerTest {
 
     verify(fileProcessingService).processAndUnsplitFile(1L);
   }
+
+  @Test
+  void deleteFileById_ShouldDeleteFile() {
+    // Arrange
+    when(fileService.deleteFileById(1L)).thenReturn(true);
+
+    // Act
+    ResponseEntity<Map<String, String>> response = fileController.deleteFileById(1L);
+
+    // Assert
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    verify(fileService).deleteFileById(1L);
+  }
+
+  @Test
+  void deleteFileById_ShouldReturnFalseIfFileDoesNotExist() {
+    // Arrange
+    when(fileService.deleteFileById(99L)).thenReturn(false);
+
+    // Act
+    ResponseEntity<Map<String, String>> response = fileController.deleteFileById(99L);
+
+    // Assert
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    verify(fileService).deleteFileById(99L);
+  }
+
+
 }
