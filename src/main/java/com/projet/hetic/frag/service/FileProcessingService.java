@@ -60,7 +60,7 @@ public class FileProcessingService {
 
     ChunkingService configuredChunkingService = new ChunkingService(tempConfig);
 
-    File tempFile = fileService.createFile(multipartFile);
+    File tempFile = fileService.createFile(multipartFile, tempConfig);
 
     try {
       AtomicInteger order = new AtomicInteger(0);

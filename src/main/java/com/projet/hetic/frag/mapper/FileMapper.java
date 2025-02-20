@@ -1,5 +1,6 @@
 package com.projet.hetic.frag.mapper;
 
+import com.projet.hetic.frag.config.ChunkingConfig;
 import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.model.File;
 
@@ -23,6 +24,19 @@ public class FileMapper {
         file.setCompressedFileSize(0L);
         file.setFilename(multipartFile.getOriginalFilename());
         file.setMimeType(multipartFile.getContentType());
+        return file;
+    }
+
+    public File splitInputToEntity(MultipartFile multipartFile, ChunkingConfig chunkingConfig) {
+        File file = new File();
+        file.setFileSize(multipartFile.getSize());
+        file.setCompressedFileSize(0L);
+        file.setFilename(multipartFile.getOriginalFilename());
+        file.setMimeType(multipartFile.getContentType());
+        file.setWindowSize(chunkingConfig.getWindowSize());
+        file.setChunkMinSize(chunkingConfig.getChunkMinSize());
+        file.setChunkMaxSize(chunkingConfig.getChunkMaxSize());
+        file.setBreakpointMask(chunkingConfig.getBreakpointMask());
         return file;
     }
 
