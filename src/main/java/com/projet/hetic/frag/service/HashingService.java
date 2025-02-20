@@ -23,4 +23,9 @@ public class HashingService {
       throw new EntityNotFoundException("Hash", "algorithm", "SHA-256");
     }
   }
+
+  public boolean compareConstructFileWithCheckHash(byte[] constructFile, String checkHash) {
+    String fileContentHash = hashAndCrypt64(constructFile);
+    return fileContentHash.equals(checkHash);
+  }
 }
