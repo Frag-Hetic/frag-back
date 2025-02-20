@@ -88,17 +88,19 @@ class FileProcessingServiceTest {
     Chunk chunkEntity1 = new Chunk();
     chunkEntity1.setId(1L);
     chunkEntity1.setSizeOriginal(chunk1.length);
+    chunkEntity1.setSizeCompressed(15);
 
     Chunk chunkEntity2 = new Chunk();
     chunkEntity2.setId(2L);
     chunkEntity2.setSizeOriginal(chunk2.length);
+    chunkEntity2.setSizeCompressed(15);
 
     when(fileService.createFile(multipartFile)).thenReturn(file);
     when(chunkingService.chunkFile(any(InputStream.class)))
         .thenReturn(Stream.of(chunk1, chunk2));
     when(chunkService.findOrCreateChunk(chunk1)).thenReturn(chunkEntity1);
     when(chunkService.findOrCreateChunk(chunk2)).thenReturn(chunkEntity2);
-
+    when(fileService.updateFile(file)).thenReturn(file);
     // Act
     File result = fileProcessingService.processAndSplitFile(multipartFile);
 

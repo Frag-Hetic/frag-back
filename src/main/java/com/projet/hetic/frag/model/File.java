@@ -25,6 +25,9 @@ public class File {
   @Column(nullable = false, name = "file_size")
   private Long fileSize;
 
+  @Column(nullable = false, name = "compressed_file_size")
+  private Long compressedFileSize;
+
   @Column(name = "mime_type", length = 150, nullable = false)
   private String mimeType;
 

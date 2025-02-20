@@ -48,9 +48,13 @@ public class FileService {
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
+  public File updateFile(File file) {
+    return fileRepository.save(file);
+  }
+  
+  @Transactional(propagation = Propagation.REQUIRED)
   public File getFileById(Long fileId) {
     return fileRepository.findById(fileId)
         .orElseThrow(() -> new EntityNotFoundException("File", "id", fileId.toString()));
-
   }
 }
