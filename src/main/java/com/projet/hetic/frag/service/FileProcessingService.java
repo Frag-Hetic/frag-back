@@ -51,7 +51,7 @@ public class FileProcessingService {
       AtomicInteger totalSizeCompressed = new AtomicInteger(0);
       InputStream inputStream = multipartFile.getInputStream();
       Stream<byte[]> chunks = chunkingService.chunkFile(inputStream);
-      chunks.map(chunk -> chunkService.findOrCreateChunk(chunk)).forEach(chunk -> {
+      chunks.map(chunkService::findOrCreateChunk).forEach(chunk -> {
         fileChunkService.createFileChunk(tempFile, chunk, order.get(), offsetStart.get());
         order.getAndIncrement();
         offsetStart.addAndGet(chunk.getSizeOriginal());
