@@ -1,5 +1,6 @@
 package com.projet.hetic.frag.mapper;
 
+import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.model.File;
 
 import org.springframework.stereotype.Component;
@@ -19,8 +20,17 @@ public class FileMapper {
     public File multipartToEntity(MultipartFile multipartFile) {
         File file = new File();
         file.setFileSize(multipartFile.getSize());
+        file.setCompressedFileSize(0L);
         file.setFilename(multipartFile.getOriginalFilename());
         file.setMimeType(multipartFile.getContentType());
         return file;
+    }
+
+    public FileDownloadDTO toDownloadDTO(File file, byte[] fileContent) {
+        FileDownloadDTO fileDownloadDTO = new FileDownloadDTO();
+        fileDownloadDTO.setFilename(file.getFilename());
+        fileDownloadDTO.setMimeType(file.getMimeType());
+        fileDownloadDTO.setFileContent(fileContent);
+        return fileDownloadDTO;
     }
 }

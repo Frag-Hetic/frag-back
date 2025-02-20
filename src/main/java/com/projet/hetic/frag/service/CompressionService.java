@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -40,5 +41,12 @@ public class CompressionService {
         } catch (IOException e) {
             throw new RuntimeException("Erreur lors de la décompression du chunk", e);
         }
+    }
+
+    /**
+     * Calcule la taille totale compressée
+     */
+    public int getTotalCompressedSize(List<byte[]> compressedChunks) {
+        return compressedChunks.stream().mapToInt(chunk -> chunk.length).sum();
     }
 }

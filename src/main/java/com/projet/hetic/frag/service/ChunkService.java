@@ -41,11 +41,11 @@ public class ChunkService {
         });
   }
 
-    /**
-     * Récupérer un chunk spécifique par son hash
-     */
-    public Optional<ChunkDTO> getChunkByHash(String hash) {
-        return chunkRepository.findByHash(hash).map(chunkMapper::toDto);
-    }
+  /**
+   * Récupérer un chunk spécifique par son hash
+   */
+  public Optional<ChunkDTO> getChunkByHash(String hash) {
+      return chunkRepository.findByHash(hash).map(chunkMapper::toDto);
+  }
 
 }
