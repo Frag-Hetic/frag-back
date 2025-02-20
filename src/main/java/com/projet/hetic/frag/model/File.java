@@ -43,6 +43,9 @@ public class File {
   @Column(name = "breakpoint_mask", length = 150, nullable = false)
   private String breakpointMask;
 
+  @Column(name = "processing_time")
+  private Long processingTime;
+
   @Column(length = 64, nullable = false, name = "check_hash")
   private String checkhash;
 

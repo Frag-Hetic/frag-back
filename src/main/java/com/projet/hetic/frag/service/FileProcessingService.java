@@ -62,6 +62,9 @@ public class FileProcessingService {
 
     File tempFile = fileService.createFile(multipartFile, tempConfig);
 
+    // Démarrer le timer
+    long startTime = System.currentTimeMillis();
+
     try {
       AtomicInteger order = new AtomicInteger(0);
       AtomicInteger offsetStart = new AtomicInteger(0);
@@ -74,7 +77,12 @@ public class FileProcessingService {
         offsetStart.addAndGet(chunk.getSizeOriginal());
         totalSizeCompressed.addAndGet(chunk.getSizeCompressed());
       });
+      // Calculer le temps écoulé
+      long processingTime = System.currentTimeMillis() - startTime;
+
       tempFile.setCompressedFileSize(totalSizeCompressed.longValue());
+      tempFile.setProcessingTime(processingTime);
+
       return fileService.updateFile(tempFile);
     } catch (IOException e) {
       throw new FileProcessingException("Fail split: " + e.getMessage());
