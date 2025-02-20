@@ -19,8 +19,7 @@ public class FileService {
   private final HashingService hashingService;
   private final FileRepository fileRepository;
 
-  public FileService(FileMapper fileMapper, HashingService hashingService, FileRepository fileRepository,
-      ChunkingService chunkingService, ChunkService chunkService, FileChunkService fileChunkService) {
+  public FileService(FileMapper fileMapper, HashingService hashingService, FileRepository fileRepository) {
     this.fileMapper = fileMapper;
     this.hashingService = hashingService;
     this.fileRepository = fileRepository;
@@ -54,8 +53,8 @@ public class FileService {
   }
   
   @Transactional(propagation = Propagation.REQUIRED)
-  public File getFileById(Long id) {
-    return fileRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("File", "id", id.toString()));
+  public File getFileById(Long fileId) {
+    return fileRepository.findById(fileId)
+        .orElseThrow(() -> new EntityNotFoundException("File", "id", fileId.toString()));
   }
 }
