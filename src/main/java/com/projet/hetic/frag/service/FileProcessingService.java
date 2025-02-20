@@ -73,7 +73,7 @@ public class FileProcessingService {
       }
 
       byte[] fileContentBytes = fileConstructionService.reconstructFileFromChunks(fileChunks, fileId);
-      if (hashingService.compareConstructFileWithCheckHash(fileContentBytes, file.getCheckhash())) {
+      if (!hashingService.compareConstructFileWithCheckHash(fileContentBytes, file.getCheckhash())) {
         throw new RuntimeException("Hashes do not match");
       }
 

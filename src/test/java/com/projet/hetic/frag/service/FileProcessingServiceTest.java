@@ -1,8 +1,10 @@
 package com.projet.hetic.frag.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -10,19 +12,26 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.exception.FileProcessingException;
+import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.Chunk;
 import com.projet.hetic.frag.model.File;
+import com.projet.hetic.frag.model.FileChunk;
 
 @ExtendWith(MockitoExtension.class)
 class FileProcessingServiceTest {
@@ -36,19 +45,27 @@ class FileProcessingServiceTest {
   @Mock
   private FileChunkService fileChunkService;
   @Mock
-  private CompressionService compressionService;
+  private FileConstructionService fileConstructionService;
   @Mock
   private HashingService hashingService;
+  @Mock
+  private FileMapper fileMapper;
+  @Mock
+  private MultipartFile multipartFile;
 
+  @InjectMocks
   private FileProcessingService fileProcessingService;
+
+  private File testFile;
+  private byte[] testContent;
 
   @BeforeEach
   void setUp() {
-    fileProcessingService = new FileProcessingService(
-        fileService,
-        chunkingService,
-        chunkService,
-        fileChunkService, compressionService, hashingService);
+    testFile = new File();
+    testFile.setId(1L);
+    testFile.setCheckhash("testHash");
+    testContent = "test content".getBytes();
+
   }
 
   @Test
@@ -120,5 +137,61 @@ class FileProcessingServiceTest {
     assertThat(exception)
         .hasMessageContaining("Test exception");
 
+  }
+
+  @Test
+  void processAndUnsplitFile_Success() {
+    // Arrange
+    FileChunk fileChunk = new FileChunk();
+    List<FileChunk> fileChunks = Arrays.asList(fileChunk);
+    FileDownloadDTO expectedDTO = new FileDownloadDTO();
+
+    when(fileService.getFileById(1L)).thenReturn(testFile);
+    when(fileChunkService.getFileChunkByFile(1L)).thenReturn(fileChunks);
+    when(fileConstructionService.reconstructFileFromChunks(fileChunks, 1L)).thenReturn(testContent);
+    when(hashingService.compareConstructFileWithCheckHash(testContent, "testHash")).thenReturn(true);
+    when(fileMapper.toDownloadDTO(testFile, testContent)).thenReturn(expectedDTO);
+
+    // Act
+    FileDownloadDTO result = fileProcessingService.processAndUnsplitFile(1L);
+
+    // Assert
+    assertThat(result)
+        .isNotNull()
+        .isEqualTo(expectedDTO);
+  }
+
+  @Test
+  void processAndUnsplitFile_EmptyChunks() {
+    // Arrange
+    when(fileService.getFileById(1L)).thenReturn(testFile);
+    when(fileChunkService.getFileChunkByFile(1L)).thenReturn(Collections.emptyList());
+    FileDownloadDTO expectedDTO = new FileDownloadDTO();
+    when(fileMapper.toDownloadDTO(eq(testFile), any())).thenReturn(expectedDTO);
+
+    // Act
+    FileDownloadDTO result = fileProcessingService.processAndUnsplitFile(1L);
+
+    // Assert
+    assertThat(result)
+        .isNotNull()
+        .isEqualTo(expectedDTO);
+  }
+
+  @Test
+  void processAndUnsplitFile_HashMismatch() {
+    // Arrange
+    FileChunk fileChunk = new FileChunk();
+    List<FileChunk> fileChunks = Arrays.asList(fileChunk);
+
+    when(fileService.getFileById(1L)).thenReturn(testFile);
+    when(fileChunkService.getFileChunkByFile(1L)).thenReturn(fileChunks);
+    when(fileConstructionService.reconstructFileFromChunks(fileChunks, 1L)).thenReturn(testContent);
+    when(hashingService.compareConstructFileWithCheckHash(testContent, "testHash")).thenReturn(false);
+
+    // Act & Assert
+    assertThatThrownBy(() -> fileProcessingService.processAndUnsplitFile(1L))
+        .isInstanceOf(FileProcessingException.class)
+        .hasMessageContaining("Fail unsplit");
   }
 }
