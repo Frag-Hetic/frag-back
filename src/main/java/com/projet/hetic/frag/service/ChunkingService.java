@@ -2,57 +2,52 @@ package com.projet.hetic.frag.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.rabinfingerprint.fingerprint.RabinFingerprintLongWindowed;
-import org.rabinfingerprint.polynomial.Polynomial;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ChunkingService {
+  private static final int WINDOW_SIZE = 48; // Taille de la fenêtre glissante
+  private static final int CHUNK_MIN_SIZE = 1024; // Taille minimale du chunk
+  private static final int CHUNK_MAX_SIZE = 8192; // Taille maximale du chunk
+  private static final int BREAKPOINT_MASK = 0x1FFF; // Masque pour détecter un point de coupure
 
-  private static final Long POLYNOMIAL = 5L; // Polynôme utilisé pour l'algorithme Rabin
+  public Stream<byte[]> chunkFile(InputStream inputStream) throws IOException {
+    List<byte[]> chunks = new ArrayList<>();
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    byte[] window = new byte[WINDOW_SIZE];
+    int bytesRead;
+    int windowIndex = 0;
+    int rollingHash = 0;
 
-  public Stream<byte[]> chunkFile(InputStream input) {
-    // 1. Créer un polynôme irréductible (53 bits)
-    Polynomial polynomial = Polynomial.createFromLong(POLYNOMIAL);
+    while ((bytesRead = inputStream.read()) != -1) {
+      // Ajouter l'octet au buffer
+      buffer.write(bytesRead);
 
-    // 2. Créer une fenêtre glissante de 48 octets
-    RabinFingerprintLongWindowed window = new RabinFingerprintLongWindowed(polynomial, 48);
-
-    // 3. Stocker les segments découpés
-    List<byte[]> segments = new ArrayList<>();
-
-    try (ByteArrayOutputStream segmentBuffer = new ByteArrayOutputStream()) {
-      int b;
-      while ((b = input.read()) != -1) {
-        // Ajouter l'octet au segment actuel
-        segmentBuffer.write(b);
-        window.pushByte((byte) b);
-
-        // Vérifier la condition de découpage (empreinte divisible par
-        // chunkBoundaryCondition)
-        if (window.getFingerprintLong() % 4096 == 0) {
-          // Ajouter le segment découpé à la liste
-          segments.add(segmentBuffer.toByteArray());
-          // System.out.println("Segment -> " + new String(segmentBuffer.toByteArray()));
-          // System.out.println("Segment printing -> " + window.getFingerprintLong());
-          // Réinitialiser le buffer pour le prochain segment
-          segmentBuffer.reset();
-        }
+      // Gérer la fenêtre glissante
+      rollingHash = ((rollingHash << 1) + bytesRead) & 0xFFFF;
+      if (buffer.size() > WINDOW_SIZE) {
+        rollingHash -= window[windowIndex];
       }
+      window[windowIndex] = (byte) bytesRead;
+      windowIndex = (windowIndex + 1) % WINDOW_SIZE;
 
-      // Ajouter le dernier segment si des données restent dans le buffer
-      if (segmentBuffer.size() > 0) {
-        segments.add(segmentBuffer.toByteArray());
+      // Vérifier les conditions de découpage
+      if ((rollingHash & BREAKPOINT_MASK) == 0 && buffer.size() >= CHUNK_MIN_SIZE || buffer.size() >= CHUNK_MAX_SIZE) {
+        chunks.add(buffer.toByteArray());
+        buffer.reset();
       }
-    } catch (Exception e) {
-      e.printStackTrace();
     }
 
-    // 4. Retourner les segments sous forme de Stream<byte[]>
-    return segments.stream();
+    // Ajouter le dernier chunk s'il reste des données
+    if (buffer.size() > 0) {
+      chunks.add(buffer.toByteArray());
+    }
+
+    return chunks.stream();
   }
 }
