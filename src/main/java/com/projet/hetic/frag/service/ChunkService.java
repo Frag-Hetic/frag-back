@@ -1,5 +1,6 @@
 package com.projet.hetic.frag.service;
 
+import com.projet.hetic.frag.dto.ChunkDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.projet.hetic.frag.mapper.ChunkMapper;
 import com.projet.hetic.frag.model.Chunk;
 import com.projet.hetic.frag.repository.ChunkRepository;
+
+import java.util.Optional;
 
 @Service
 public class ChunkService {
@@ -37,4 +40,12 @@ public class ChunkService {
           return chunkRepository.save(chunk);
         });
   }
+
+  /**
+   * Récupérer un chunk spécifique par son hash
+   */
+  public Optional<ChunkDTO> getChunkByHash(String hash) {
+      return chunkRepository.findByHash(hash).map(chunkMapper::toDto);
+  }
+
 }

@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class FileChunk {
 
   @ManyToOne
   @JoinColumn(name = "chunk_id", nullable = false)
-  @JsonBackReference
+  @JsonManagedReference
   private Chunk chunk;
 
   @Column(nullable = false, name = "chunk_order")
