@@ -31,6 +31,21 @@ public class File {
   @Column(name = "mime_type", length = 150, nullable = false)
   private String mimeType;
 
+  @Column(name = "window_size", nullable = false)
+  private Integer windowSize;
+
+  @Column(name = "chunk_min_size", nullable = false)
+  private Integer chunkMinSize;
+
+  @Column(name = "chunk_max_size", nullable = false)
+  private Integer chunkMaxSize;
+
+  @Column(name = "breakpoint_mask", length = 150, nullable = false)
+  private String breakpointMask;
+
+  @Column(name = "processing_time")
+  private String processingTime;
+
   @Column(length = 64, nullable = false, name = "check_hash")
   private String checkhash;
 

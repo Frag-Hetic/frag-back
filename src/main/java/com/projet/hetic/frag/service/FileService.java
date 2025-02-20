@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.config.ChunkingConfig;
 import com.projet.hetic.frag.exception.EntityNotFoundException;
 import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
@@ -26,8 +27,8 @@ public class FileService {
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
-  public File createFile(MultipartFile multipartFile) {
-    File file = fileMapper.multipartToEntity(multipartFile);
+  public File createFile(MultipartFile multipartFile, ChunkingConfig chunkingConfig) {
+    File file = fileMapper.splitInputToEntity(multipartFile, chunkingConfig);
 
     byte[] bytes;
     try {
@@ -51,7 +52,7 @@ public class FileService {
   public File updateFile(File file) {
     return fileRepository.save(file);
   }
-  
+
   @Transactional(propagation = Propagation.REQUIRED)
   public File getFileById(Long fileId) {
     return fileRepository.findById(fileId)

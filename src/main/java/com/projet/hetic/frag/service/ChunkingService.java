@@ -9,41 +9,41 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 
+import com.projet.hetic.frag.config.ChunkingConfig;
+
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ChunkingService {
-  private static final int WINDOW_SIZE = 48; // Taille de la fenêtre glissante
-  private static final int CHUNK_MIN_SIZE = 1024; // Taille minimale du chunk
-  private static final int CHUNK_MAX_SIZE = 8192; // Taille maximale du chunk
-  private static final int BREAKPOINT_MASK = 0x1FFF; // Masque pour détecter un point de coupure
+  private final ChunkingConfig config;
 
   public Stream<byte[]> chunkFile(InputStream inputStream) throws IOException {
     List<byte[]> chunks = new ArrayList<>();
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-    byte[] window = new byte[WINDOW_SIZE];
+    byte[] window = new byte[config.getWindowSize()];
     int bytesRead;
     int windowIndex = 0;
     int rollingHash = 0;
+    int breakpointMask = Integer.decode(config.getBreakpointMask());
 
     while ((bytesRead = inputStream.read()) != -1) {
-      // Ajouter l'octet au buffer
       buffer.write(bytesRead);
 
-      // Gérer la fenêtre glissante
       rollingHash = ((rollingHash << 1) + bytesRead) & 0xFFFF;
-      if (buffer.size() > WINDOW_SIZE) {
+      if (buffer.size() > config.getWindowSize()) {
         rollingHash -= window[windowIndex];
       }
       window[windowIndex] = (byte) bytesRead;
-      windowIndex = (windowIndex + 1) % WINDOW_SIZE;
+      windowIndex = (windowIndex + 1) % config.getWindowSize();
 
-      // Vérifier les conditions de découpage
-      if ((rollingHash & BREAKPOINT_MASK) == 0 && buffer.size() >= CHUNK_MIN_SIZE || buffer.size() >= CHUNK_MAX_SIZE) {
+      if ((rollingHash & breakpointMask) == 0 && buffer.size() >= config.getChunkMinSize()
+          || buffer.size() >= config.getChunkMaxSize()) {
         chunks.add(buffer.toByteArray());
         buffer.reset();
       }
     }
 
-    // Ajouter le dernier chunk s'il reste des données
     if (buffer.size() > 0) {
       chunks.add(buffer.toByteArray());
     }
