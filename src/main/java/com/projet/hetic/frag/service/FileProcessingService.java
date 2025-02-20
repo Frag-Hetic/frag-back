@@ -1,6 +1,5 @@
 package com.projet.hetic.frag.service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -14,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.exception.FileProcessingException;
-import com.projet.hetic.frag.model.Chunk;
+import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.model.FileChunk;
 
@@ -24,26 +23,26 @@ public class FileProcessingService {
   private final ChunkingService chunkingService;
   private final ChunkService chunkService;
   private final FileChunkService fileChunkService;
-  private final CompressionService compressionService;
+  private final FileConstructionService fileConstructionService;
   private final HashingService hashingService;
+  private final FileMapper fileMapper;
 
   public FileProcessingService(FileService fileService,
       ChunkingService chunkingService,
-      ChunkService chunkService, FileChunkService fileChunkService, CompressionService compressionService,
-      HashingService hashingService) {
+      ChunkService chunkService, FileChunkService fileChunkService,
+      HashingService hashingService, FileMapper fileMapper, FileConstructionService fileConstructionService) {
     this.fileService = fileService;
     this.chunkingService = chunkingService;
     this.chunkService = chunkService;
     this.fileChunkService = fileChunkService;
-    this.compressionService = compressionService;
+    this.fileConstructionService = fileConstructionService;
     this.hashingService = hashingService;
+    this.fileMapper = fileMapper;
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
   public File processAndSplitFile(MultipartFile multipartFile) {
     File file = fileService.createFile(multipartFile);
-    System.out.println("Segment " + file.getId() + ": size -> "
-        + new String(file.getFileSize() + " bytes, compressed size -> "));
 
     try {
       AtomicInteger order = new AtomicInteger(0);
@@ -58,7 +57,7 @@ public class FileProcessingService {
       });
       return file;
     } catch (IOException e) {
-      throw new FileProcessingException(e.getMessage());
+      throw new FileProcessingException("Fail split: " + e.getMessage());
     }
   }
 
@@ -66,38 +65,21 @@ public class FileProcessingService {
   public FileDownloadDTO processAndUnsplitFile(Long fileId) {
     try {
       File file = fileService.getFileById(fileId);
-
-      // Retrieve sorted file chunks
       List<FileChunk> fileChunks = fileChunkService.getFileChunkByFile(fileId);
 
       if (fileChunks.isEmpty()) {
-        throw new FileProcessingException("No chunks found for file ID: " + fileId);
-      }
-      // Reconstruct file content
-      try (ByteArrayOutputStream fileContent = new ByteArrayOutputStream()) {
-        for (FileChunk fileChunk : fileChunks) {
-          Chunk chunk = fileChunk.getChunk();
-          byte[] compressedData = chunk.getData();
-          byte[] uncompressedData = compressionService.decompressChunk(compressedData);
-          fileContent.write(uncompressedData);
-        }
-
-        // Compare file hash and new fileContent hash
-        byte[] fileContentBytes = fileContent.toByteArray();
-        String fileContentHash = hashingService.hashAndCrypt64(fileContentBytes);
-        if (!fileContentHash.equals(file.getCheckhash())) {
-          throw new FileProcessingException("File content hash mismatch");
-        }
-
-        // Return the reconstructed file
-        return new FileDownloadDTO(file.getFilename(), file.getMimeType(), fileContent.toByteArray());
-
-      } catch (IOException e) {
-        throw new FileProcessingException("Error reconstructing file: " + e.getMessage());
+        byte[] fileContentBytes = {};
+        return fileMapper.toDownloadDTO(file, fileContentBytes);
       }
 
+      byte[] fileContentBytes = fileConstructionService.reconstructFileFromChunks(fileChunks, fileId);
+      if (!hashingService.compareConstructFileWithCheckHash(fileContentBytes, file.getCheckhash())) {
+        throw new RuntimeException("Hashes do not match");
+      }
+
+      return fileMapper.toDownloadDTO(file, fileContentBytes);
     } catch (RuntimeException e) {
-      throw new FileProcessingException("Failed to process file: " + e.getMessage());
+      throw new FileProcessingException("Fail unsplit: " + e.getMessage());
     }
   }
 }
