@@ -11,8 +11,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.projet.hetic.frag.config.ChunkingConfig;
@@ -97,27 +99,29 @@ class FileServiceTest {
     FileFilterDto filters = new FileFilterDto();
     File file1 = new File();
     File file2 = new File();
-    when(fileRepository.findAllWithFilters(null, null)).thenReturn(Arrays.asList(file1, file2));
+    List<File> expectedFiles = Arrays.asList(file1, file2);
+    when(fileRepository.findAll(ArgumentMatchers.<Specification<File>>any())).thenReturn(expectedFiles);
 
     // Act
     List<File> result = fileService.getAllFile(filters);
 
     // Assert
     assertThat(result).hasSize(2).containsExactly(file1, file2);
+    verify(fileRepository).findAll(ArgumentMatchers.<Specification<File>>any());
   }
 
   @Test
   void getAllFile_WhenNoFiles_ShouldReturnEmptyList() {
     // Arrange
     FileFilterDto filters = new FileFilterDto();
-    when(fileRepository.findAllWithFilters(filters.getFileName(), filters.getMimeType()))
-        .thenReturn(Collections.emptyList());
+    when(fileRepository.findAll(ArgumentMatchers.<Specification<File>>any())).thenReturn(Collections.emptyList());
 
     // Act
     List<File> result = fileService.getAllFile(filters);
 
     // Assert
     assertThat(result).isEmpty();
+    verify(fileRepository).findAll(ArgumentMatchers.<Specification<File>>any());
   }
 
   @Test
@@ -125,16 +129,20 @@ class FileServiceTest {
     // Arrange
     FileFilterDto filters = new FileFilterDto();
     filters.setFileName("test");
+    filters.setMimeType("text/plain");
+
     File file1 = new File();
     file1.setFileName("test1.txt");
-    when(fileRepository.findAllWithFilters(filters.getFileName(), filters.getMimeType()))
-        .thenReturn(Arrays.asList(file1));
+    file1.setMimeType("text/plain");
+
+    when(fileRepository.findAll(ArgumentMatchers.<Specification<File>>any())).thenReturn(Arrays.asList(file1));
 
     // Act
     List<File> result = fileService.getAllFile(filters);
 
     // Assert
     assertThat(result).hasSize(1).containsExactly(file1);
+    verify(fileRepository).findAll(ArgumentMatchers.<Specification<File>>any());
   }
 
   @Test
