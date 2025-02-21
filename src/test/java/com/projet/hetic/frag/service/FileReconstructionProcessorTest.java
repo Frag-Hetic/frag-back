@@ -51,7 +51,7 @@ class FileReconstructionProcessorTest {
     // Préparation du fichier mock
     mockFile = new File();
     mockFile.setId(1L);
-    mockFile.setFilename("test.txt");
+    mockFile.setFileName("test.txt");
     mockFile.setCheckhash("mockhash123");
 
     // Préparation des chunks

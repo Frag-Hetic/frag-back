@@ -14,6 +14,7 @@ import com.projet.hetic.frag.exception.EntityNotFoundException;
 import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.repository.FileRepository;
+import com.projet.hetic.frag.specification.FileSpecification;
 
 @Service
 public class FileService {
@@ -46,9 +47,7 @@ public class FileService {
 
   @Transactional(propagation = Propagation.REQUIRED)
   public List<File> getAllFile(FileFilterDto filters) {
-    return fileRepository.findAllWithFilters(
-        filters.getFileName(),
-        filters.getMimeType());
+    return fileRepository.findAll(FileSpecification.withFilters(filters));
   }
 
   @Transactional(propagation = Propagation.REQUIRED)

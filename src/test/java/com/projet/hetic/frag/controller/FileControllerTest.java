@@ -53,11 +53,11 @@ public class FileControllerTest {
   void setUp() {
     testFile1 = new File();
     testFile1.setId(1L);
-    testFile1.setFilename("test1.txt");
+    testFile1.setFileName("test1.txt");
 
     testFile2 = new File();
     testFile2.setId(2L);
-    testFile2.setFilename("test2.txt");
+    testFile2.setFileName("test2.txt");
 
     multipartMock = new MockMultipartFile(
         "file",

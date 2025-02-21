@@ -61,7 +61,7 @@ class FileMapperTest {
         .satisfies(file -> {
           assertThat(file.getFileSize()).isEqualTo(mockMultipartFile.getSize());
           assertThat(file.getCompressedFileSize()).isEqualTo(0L);
-          assertThat(file.getFilename()).isEqualTo("test.txt");
+          assertThat(file.getFileName()).isEqualTo("test.txt");
           assertThat(file.getMimeType()).isEqualTo(MediaType.TEXT_PLAIN_VALUE);
           assertThat(file.getWindowSize()).isEqualTo(48);
           assertThat(file.getChunkMinSize()).isEqualTo(1024);
@@ -87,7 +87,7 @@ class FileMapperTest {
         .isNotNull()
         .satisfies(file -> {
           assertThat(file.getFileSize()).isZero();
-          assertThat(file.getFilename()).isEqualTo("empty.txt");
+          assertThat(file.getFileName()).isEqualTo("empty.txt");
         });
   }
 
@@ -107,7 +107,7 @@ class FileMapperTest {
     assertThat(result)
         .isNotNull()
         .satisfies(file -> {
-          assertThat(file.getFilename()).isEmpty();
+          assertThat(file.getFileName()).isEmpty();
           assertThat(file.getMimeType()).isEqualTo(MediaType.TEXT_PLAIN_VALUE);
         });
   }
@@ -115,7 +115,7 @@ class FileMapperTest {
   @Test
   void toDownloadDTO_ShouldMapAllFields() {
     // Arrange
-    testFile.setFilename("test.txt");
+    testFile.setFileName("test.txt");
     testFile.setMimeType("text/plain");
 
     // Act
@@ -134,7 +134,7 @@ class FileMapperTest {
   @Test
   void toDownloadDTO_WithNullValues_ShouldMapNullValues() {
     // Arrange
-    testFile.setFilename(null);
+    testFile.setFileName(null);
     testFile.setMimeType(null);
 
     // Act
@@ -153,7 +153,7 @@ class FileMapperTest {
   @Test
   void toDownloadDTO_WithEmptyContent_ShouldMapEmptyContent() {
     // Arrange
-    testFile.setFilename("empty.txt");
+    testFile.setFileName("empty.txt");
     testFile.setMimeType("text/plain");
     byte[] emptyContent = new byte[0];
 

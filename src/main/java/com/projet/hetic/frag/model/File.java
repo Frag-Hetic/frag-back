@@ -20,7 +20,7 @@ public class File {
   private Long id;
 
   @Column(nullable = false, name = "file_name")
-  private String filename;
+  private String fileName;
 
   @Column(nullable = false, name = "file_size")
   private Long fileSize;

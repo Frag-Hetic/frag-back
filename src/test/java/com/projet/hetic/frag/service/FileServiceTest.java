@@ -126,7 +126,7 @@ class FileServiceTest {
     FileFilterDto filters = new FileFilterDto();
     filters.setFileName("test");
     File file1 = new File();
-    file1.setFilename("test1.txt");
+    file1.setFileName("test1.txt");
     when(fileRepository.findAllWithFilters(filters.getFileName(), filters.getMimeType()))
         .thenReturn(Arrays.asList(file1));
 
