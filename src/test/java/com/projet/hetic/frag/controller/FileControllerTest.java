@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import com.projet.hetic.frag.dto.ChunkingParamsDto;
 import com.projet.hetic.frag.dto.FileDownloadDTO;
+import com.projet.hetic.frag.dto.FileFilterDto;
 import com.projet.hetic.frag.exception.FileProcessingException;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.service.FileProcessingService;
@@ -57,11 +59,11 @@ public class FileControllerTest {
   void setUp() {
     testFile1 = new File();
     testFile1.setId(1L);
-    testFile1.setFilename("test1.txt");
+    testFile1.setFileName("test1.txt");
 
     testFile2 = new File();
     testFile2.setId(2L);
-    testFile2.setFilename("test2.txt");
+    testFile2.setFileName("test2.txt");
 
     multipartMock = new MockMultipartFile(
         "file",
@@ -83,18 +85,36 @@ public class FileControllerTest {
   }
 
   @Test
-  void getFiles_ShouldReturnListOfFiles() {
+  void getFiles_WithFilters_ShouldReturnFilteredFiles() {
     // Arrange
+    FileFilterDto filters = new FileFilterDto();
+    filters.setFileName("test"); // Définir les critères de filtrage
     List<File> expectedFiles = Arrays.asList(testFile1, testFile2);
-    when(fileService.getAllFile()).thenReturn(expectedFiles);
+    when(fileService.getAllFile(filters)).thenReturn(expectedFiles);
 
     // Act
-    ResponseEntity<List<File>> response = fileController.getFiles();
+    ResponseEntity<List<File>> response = fileController.getFiles(filters);
 
     // Assert
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response.getBody()).isEqualTo(expectedFiles);
-    verify(fileService).getAllFile();
+    verify(fileService).getAllFile(filters);
+  }
+
+  @Test
+  void getFiles_WithEmptyFilters_ShouldReturnEmptyList() {
+    // Arrange
+    FileFilterDto filters = new FileFilterDto();
+    List<File> emptyList = Collections.emptyList();
+    when(fileService.getAllFile(filters)).thenReturn(emptyList);
+
+    // Act
+    ResponseEntity<List<File>> response = fileController.getFiles(filters);
+
+    // Assert
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).isEmpty();
+    verify(fileService).getAllFile(filters);
   }
 
   @Test

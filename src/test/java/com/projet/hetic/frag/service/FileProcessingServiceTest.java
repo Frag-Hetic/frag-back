@@ -53,7 +53,7 @@ class FileProcessingServiceTest {
     // Configuration du fichier résultant
     mockFile = new File();
     mockFile.setId(1L);
-    mockFile.setFilename("test.txt");
+    mockFile.setFileName("test.txt");
 
     // Configuration du DTO de téléchargement
     mockDownloadDTO = new FileDownloadDTO();

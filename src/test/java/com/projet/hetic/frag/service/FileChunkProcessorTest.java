@@ -77,7 +77,7 @@ class FileChunkProcessorTest {
 
     mockFile = new File();
     mockFile.setId(1L);
-    mockFile.setFilename("test.txt");
+    mockFile.setFileName("test.txt");
 
     mockChunk = new Chunk();
     mockChunk.setId(1L);

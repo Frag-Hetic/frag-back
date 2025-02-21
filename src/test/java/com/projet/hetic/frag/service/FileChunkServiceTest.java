@@ -35,7 +35,7 @@ class FileChunkServiceTest {
     // Arrange
     File file = new File();
     file.setId(1L);
-    file.setFilename("test.txt");
+    file.setFileName("test.txt");
 
     Chunk chunk = new Chunk();
     chunk.setId(1L);
@@ -70,7 +70,7 @@ class FileChunkServiceTest {
     // Arrange
     File file = new File();
     file.setId(1L);
-    file.setFilename("test.txt");
+    file.setFileName("test.txt");
 
     Chunk chunk1 = new Chunk();
     chunk1.setId(1L);

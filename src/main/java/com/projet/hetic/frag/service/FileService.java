@@ -10,10 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.projet.hetic.frag.config.ChunkingConfig;
+import com.projet.hetic.frag.dto.FileFilterDto;
 import com.projet.hetic.frag.exception.EntityNotFoundException;
 import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.repository.FileRepository;
+import com.projet.hetic.frag.specification.FileSpecification;
 
 @Service
 public class FileService {
@@ -45,8 +47,8 @@ public class FileService {
   }
 
   @Transactional(propagation = Propagation.REQUIRED)
-  public List<File> getAllFile() {
-    return fileRepository.findAll();
+  public List<File> getAllFile(FileFilterDto filters) {
+    return fileRepository.findAll(FileSpecification.withFilters(filters));
   }
 
   @Transactional(propagation = Propagation.REQUIRED)

@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.projet.hetic.frag.dto.ChunkingParamsDto;
 import com.projet.hetic.frag.dto.FileDownloadDTO;
+import com.projet.hetic.frag.dto.FileFilterDto;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.service.FileProcessingService;
 import com.projet.hetic.frag.service.FileService;
@@ -36,8 +37,8 @@ public class FileController {
     }
 
     @GetMapping
-    public ResponseEntity<List<File>> getFiles() {
-        List<File> files = fileService.getAllFile();
+    public ResponseEntity<List<File>> getFiles(@ModelAttribute FileFilterDto filters) {
+        List<File> files = fileService.getAllFile(filters);
         return ResponseEntity.ok(files);
     }
 

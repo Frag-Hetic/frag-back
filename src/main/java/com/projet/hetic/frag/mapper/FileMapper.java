@@ -16,7 +16,7 @@ public class FileMapper {
         File file = new File();
         file.setFileSize(multipartFile.getSize());
         file.setCompressedFileSize(0L);
-        file.setFilename(multipartFile.getOriginalFilename());
+        file.setFileName(multipartFile.getOriginalFilename());
         file.setMimeType(multipartFile.getContentType());
         file.setWindowSize(chunkingConfig.getWindowSize());
         file.setChunkMinSize(chunkingConfig.getChunkMinSize());
@@ -27,7 +27,7 @@ public class FileMapper {
 
     public FileDownloadDTO toDownloadDTO(File file, byte[] fileContent) {
         FileDownloadDTO fileDownloadDTO = new FileDownloadDTO();
-        fileDownloadDTO.setFilename(file.getFilename());
+        fileDownloadDTO.setFilename(file.getFileName());
         fileDownloadDTO.setMimeType(file.getMimeType());
         fileDownloadDTO.setFileContent(fileContent);
         return fileDownloadDTO;
