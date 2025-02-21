@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.projet.hetic.frag.config.ChunkingConfig;
+import com.projet.hetic.frag.dto.FileFilterDto;
 import com.projet.hetic.frag.mapper.FileMapper;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.repository.FileRepository;
@@ -93,12 +94,13 @@ class FileServiceTest {
   @Test
   void getAllFile_ShouldReturnAllFiles() {
     // Arrange
+    FileFilterDto filters = new FileFilterDto();
     File file1 = new File();
     File file2 = new File();
-    when(fileRepository.findAll()).thenReturn(Arrays.asList(file1, file2));
+    when(fileRepository.findAllWithFilters(null, null)).thenReturn(Arrays.asList(file1, file2));
 
     // Act
-    List<File> result = fileService.getAllFile();
+    List<File> result = fileService.getAllFile(filters);
 
     // Assert
     assertThat(result).hasSize(2).containsExactly(file1, file2);
@@ -107,13 +109,32 @@ class FileServiceTest {
   @Test
   void getAllFile_WhenNoFiles_ShouldReturnEmptyList() {
     // Arrange
-    when(fileRepository.findAll()).thenReturn(Collections.emptyList());
+    FileFilterDto filters = new FileFilterDto();
+    when(fileRepository.findAllWithFilters(filters.getFileName(), filters.getMimeType()))
+        .thenReturn(Collections.emptyList());
 
     // Act
-    List<File> result = fileService.getAllFile();
+    List<File> result = fileService.getAllFile(filters);
 
     // Assert
     assertThat(result).isEmpty();
+  }
+
+  @Test
+  void getAllFile_WithFilters_ShouldReturnFilteredFiles() {
+    // Arrange
+    FileFilterDto filters = new FileFilterDto();
+    filters.setFileName("test");
+    File file1 = new File();
+    file1.setFilename("test1.txt");
+    when(fileRepository.findAllWithFilters(filters.getFileName(), filters.getMimeType()))
+        .thenReturn(Arrays.asList(file1));
+
+    // Act
+    List<File> result = fileService.getAllFile(filters);
+
+    // Assert
+    assertThat(result).hasSize(1).containsExactly(file1);
   }
 
   @Test
