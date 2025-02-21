@@ -12,21 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Component
 public class FileMapper {
-    /**
-     * Convertit un MultipartFile en entité FileInputDto
-     * 
-     * @param multipartFile
-     * @return Entité FileInputDto without hash
-     */
-    public File multipartToEntity(MultipartFile multipartFile) {
-        File file = new File();
-        file.setFileSize(multipartFile.getSize());
-        file.setCompressedFileSize(0L);
-        file.setFilename(multipartFile.getOriginalFilename());
-        file.setMimeType(multipartFile.getContentType());
-        return file;
-    }
-
     public File splitInputToEntity(MultipartFile multipartFile, ChunkingConfig chunkingConfig) {
         File file = new File();
         file.setFileSize(multipartFile.getSize());

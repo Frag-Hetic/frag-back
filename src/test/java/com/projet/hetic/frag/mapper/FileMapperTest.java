@@ -1,20 +1,31 @@
 package com.projet.hetic.frag.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.projet.hetic.frag.config.ChunkingConfig;
 import com.projet.hetic.frag.dto.FileDownloadDTO;
 import com.projet.hetic.frag.model.File;
 
+@ExtendWith(MockitoExtension.class)
 class FileMapperTest {
 
+  @InjectMocks
   private FileMapper fileMapper;
+
+  @Mock
+  private ChunkingConfig chunkingConfig;
+
   private MultipartFile mockMultipartFile;
   private File testFile;
   private byte[] testContent;
@@ -24,27 +35,81 @@ class FileMapperTest {
     fileMapper = new FileMapper();
     testFile = new File();
     testContent = "test content".getBytes();
-    mockMultipartFile = mock(MultipartFile.class);
+    // Configuration du mock MultipartFile
+    mockMultipartFile = new MockMultipartFile(
+        "testFile",
+        "test.txt",
+        MediaType.TEXT_PLAIN_VALUE,
+        "Contenu test".getBytes());
+
   }
 
   @Test
-  void multipartToEntity_ShouldMapAllFields() {
-    // Arrange
-    String filename = "test.txt";
-    String contentType = "text/plain";
-    long fileSize = 1024L;
-
-    when(mockMultipartFile.getOriginalFilename()).thenReturn(filename);
-    when(mockMultipartFile.getContentType()).thenReturn(contentType);
-    when(mockMultipartFile.getSize()).thenReturn(fileSize);
+  void splitInputToEntity_ShouldMapAllFields() {
+    // Configuration du mock ChunkingConfig
+    when(chunkingConfig.getWindowSize()).thenReturn(48);
+    when(chunkingConfig.getChunkMinSize()).thenReturn(1024);
+    when(chunkingConfig.getChunkMaxSize()).thenReturn(8192);
+    when(chunkingConfig.getBreakpointMask()).thenReturn("0x1FFF");
 
     // Act
-    File result = fileMapper.multipartToEntity(mockMultipartFile);
+    File result = fileMapper.splitInputToEntity(mockMultipartFile, chunkingConfig);
 
     // Assert
-    assertEquals(filename, result.getFilename());
-    assertEquals(contentType, result.getMimeType());
-    assertEquals(fileSize, result.getFileSize());
+    assertThat(result)
+        .isNotNull()
+        .satisfies(file -> {
+          assertThat(file.getFileSize()).isEqualTo(mockMultipartFile.getSize());
+          assertThat(file.getCompressedFileSize()).isEqualTo(0L);
+          assertThat(file.getFilename()).isEqualTo("test.txt");
+          assertThat(file.getMimeType()).isEqualTo(MediaType.TEXT_PLAIN_VALUE);
+          assertThat(file.getWindowSize()).isEqualTo(48);
+          assertThat(file.getChunkMinSize()).isEqualTo(1024);
+          assertThat(file.getChunkMaxSize()).isEqualTo(8192);
+          assertThat(file.getBreakpointMask()).isEqualTo("0x1FFF");
+        });
+  }
+
+  @Test
+  void splitInputToEntity_WithEmptyFile_ShouldMapCorrectly() {
+    // Arrange
+    MockMultipartFile emptyFile = new MockMultipartFile(
+        "emptyFile",
+        "empty.txt",
+        MediaType.TEXT_PLAIN_VALUE,
+        new byte[0]);
+
+    // Act
+    File result = fileMapper.splitInputToEntity(emptyFile, chunkingConfig);
+
+    // Assert
+    assertThat(result)
+        .isNotNull()
+        .satisfies(file -> {
+          assertThat(file.getFileSize()).isZero();
+          assertThat(file.getFilename()).isEqualTo("empty.txt");
+        });
+  }
+
+  @Test
+  void splitInputToEntity_WithNullFilename_ShouldMapCorrectly() {
+    // Arrange
+    MockMultipartFile fileWithNullName = new MockMultipartFile(
+        "file",
+        "",
+        MediaType.TEXT_PLAIN_VALUE,
+        "Contenu".getBytes());
+
+    // Act
+    File result = fileMapper.splitInputToEntity(fileWithNullName, chunkingConfig);
+
+    // Assert
+    assertThat(result)
+        .isNotNull()
+        .satisfies(file -> {
+          assertThat(file.getFilename()).isEmpty();
+          assertThat(file.getMimeType()).isEqualTo(MediaType.TEXT_PLAIN_VALUE);
+        });
   }
 
   @Test
