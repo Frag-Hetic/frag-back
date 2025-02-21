@@ -2,6 +2,7 @@ package com.projet.hetic.frag.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -58,4 +59,12 @@ public class FileService {
     return fileRepository.findById(fileId)
         .orElseThrow(() -> new EntityNotFoundException("File", "id", fileId.toString()));
   }
+
+  public void deleteFileById(Long id) {
+    if (!fileRepository.existsById(id)) {
+      throw new EntityNotFoundException("File", "id", id.toString());
+    }
+    fileRepository.deleteById(id);
+  }
+
 }
