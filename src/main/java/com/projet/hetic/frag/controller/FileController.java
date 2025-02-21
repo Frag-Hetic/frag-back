@@ -48,7 +48,7 @@ public class FileController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteFile(@PathVariable Long id) {
         fileService.deleteFileById(id);
         return ResponseEntity.ok(Map.of("status", "success", "message", "File deleted successfully"));
     }
