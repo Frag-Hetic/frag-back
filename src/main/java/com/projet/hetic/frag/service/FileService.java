@@ -60,15 +60,11 @@ public class FileService {
         .orElseThrow(() -> new EntityNotFoundException("File", "id", fileId.toString()));
   }
 
-  public boolean deleteFileById(Long id) {
-    Optional<File> fileOptional = fileRepository.findById(id);
-
-    if (fileOptional.isPresent()) {
-      fileRepository.deleteById(id);
-      return true;
-    } else {
-      return false;
+  public void deleteFileById(Long id) {
+    if (!fileRepository.existsById(id)) {
+      throw new EntityNotFoundException("File", "id", id.toString());
     }
+    fileRepository.deleteById(id);
   }
 
 }

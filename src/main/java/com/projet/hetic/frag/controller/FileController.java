@@ -48,16 +48,9 @@ public class FileController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteFileById(@PathVariable Long id) {
-        boolean deleted = fileService.deleteFileById(id);
-
-        if (deleted) {
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "File deleted successfully");
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
+        fileService.deleteFileById(id);
+        return ResponseEntity.ok(Map.of("status", "success", "message", "File deleted successfully"));
     }
 
     @PostMapping("/split")

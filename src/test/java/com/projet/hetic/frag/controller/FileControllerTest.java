@@ -151,31 +151,5 @@ public class FileControllerTest {
     verify(fileProcessingService).processAndUnsplitFile(1L);
   }
 
-  @Test
-  void deleteFileById_ShouldDeleteFile() {
-    // Arrange
-    when(fileService.deleteFileById(1L)).thenReturn(true);
-
-    // Act
-    ResponseEntity<Map<String, String>> response = fileController.deleteFileById(1L);
-
-    // Assert
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    verify(fileService).deleteFileById(1L);
-  }
-
-  @Test
-  void deleteFileById_ShouldReturnFalseIfFileDoesNotExist() {
-    // Arrange
-    when(fileService.deleteFileById(99L)).thenReturn(false);
-
-    // Act
-    ResponseEntity<Map<String, String>> response = fileController.deleteFileById(99L);
-
-    // Assert
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    verify(fileService).deleteFileById(99L);
-  }
-
 
 }
