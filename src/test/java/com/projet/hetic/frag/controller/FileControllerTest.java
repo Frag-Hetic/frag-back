@@ -1,10 +1,12 @@
 package com.projet.hetic.frag.controller;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-// import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +23,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.mock.web.MockMultipartFile;
 
+import com.projet.hetic.frag.dto.ChunkingParamsDto;
 import com.projet.hetic.frag.dto.FileDownloadDTO;
+import com.projet.hetic.frag.exception.FileProcessingException;
 import com.projet.hetic.frag.model.File;
 import com.projet.hetic.frag.service.FileProcessingService;
 import com.projet.hetic.frag.service.FileService;
@@ -46,8 +49,9 @@ public class FileControllerTest {
 
   private File testFile1;
   private File testFile2;
-  // private MockMultipartFile multipartMock;
+  private MockMultipartFile multipartMock;
   private FileDownloadDTO fileDownloadDTO;
+  private ChunkingParamsDto chunkingParams;
 
   @BeforeEach
   void setUp() {
@@ -59,11 +63,18 @@ public class FileControllerTest {
     testFile2.setId(2L);
     testFile2.setFilename("test2.txt");
 
-    // multipartMock = new MockMultipartFile(
-    // "file",
-    // "test1.txt",
-    // MediaType.TEXT_PLAIN_VALUE,
-    // "Hello, World!".getBytes());
+    multipartMock = new MockMultipartFile(
+        "file",
+        "test1.txt",
+        MediaType.TEXT_PLAIN_VALUE,
+        "Hello, World!".getBytes());
+
+    // Ajout des paramètres de chunking
+    chunkingParams = new ChunkingParamsDto();
+    chunkingParams.setWindowSize(16);
+    chunkingParams.setChunkMinSize(64);
+    chunkingParams.setChunkMaxSize(8192);
+    chunkingParams.setBreakpointMask("0x3FF");
 
     fileDownloadDTO = new FileDownloadDTO(
         "test1.txt",
@@ -100,34 +111,52 @@ public class FileControllerTest {
     assertEquals(testFile1, responseBody);
   }
 
-  // @Test
-  // void splitFile_ShouldProcessAndReturnFile() throws Exception {
-  // // Arrange
-  // MockMultipartFile mockFile = multipartMock;
-  // File expectedFile = testFile1;
-
-  // when(fileProcessingService.processAndSplitFile(mockFile)).thenReturn(expectedFile);
-
-  // // Act
-  // ResponseEntity<File> response = fileController.splitFile(mockFile);
-
-  // // Assert
-  // assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-  // assertNotNull(response.getBody());
-  // assertEquals(expectedFile, response.getBody());
-  // }
-
   @Test
-  void getChunks_ShouldReturnSuccessMessage() {
+  void splitFile_WithValidParamsAndFile_ShouldReturnCreatedFile() {
     // Arrange
-    MultipartFile file = mock(MultipartFile.class);
+    when(fileProcessingService.processAndSplitFile(multipartMock, chunkingParams))
+        .thenReturn(testFile1);
 
     // Act
-    ResponseEntity<String> response = fileController.getChunks(file);
+    ResponseEntity<File> response = fileController.splitFile(multipartMock, chunkingParams);
 
     // Assert
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getBody()).isEqualTo("hello");
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    assertThat(response.getBody()).isEqualTo(testFile1);
+    assertThat(response.getHeaders().getLocation())
+        .isEqualTo(URI.create("/files/1"));
+
+    verify(fileProcessingService).processAndSplitFile(multipartMock, chunkingParams);
+  }
+
+  @Test
+  void splitFile_WithDefaultParams_ShouldReturnCreatedFile() {
+    // Arrange
+    when(fileProcessingService.processAndSplitFile(multipartMock, null))
+        .thenReturn(testFile1);
+
+    // Act
+    ResponseEntity<File> response = fileController.splitFile(multipartMock, null);
+
+    // Assert
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+    assertThat(response.getBody()).isEqualTo(testFile1);
+    assertThat(response.getHeaders().getLocation())
+        .isEqualTo(URI.create("/files/1"));
+
+    verify(fileProcessingService).processAndSplitFile(multipartMock, null);
+  }
+
+  @Test
+  void splitFile_WhenProcessingFails_ShouldThrowException() {
+    // Arrange
+    when(fileProcessingService.processAndSplitFile(multipartMock, chunkingParams))
+        .thenThrow(new FileProcessingException("Erreur de traitement"));
+
+    // Act & Assert
+    assertThrows(FileProcessingException.class, () -> {
+      fileController.splitFile(multipartMock, chunkingParams);
+    });
   }
 
   @Test

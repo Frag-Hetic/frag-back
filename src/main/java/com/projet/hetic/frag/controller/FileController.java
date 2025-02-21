@@ -56,15 +56,9 @@ public class FileController {
     @PostMapping("/split")
     public ResponseEntity<File> splitFile(@RequestParam("file") MultipartFile multipartFile,
             @ModelAttribute @Valid ChunkingParamsDto params) {
-
         File file = fileProcessingService.processAndSplitFile(multipartFile, params);
         URI location = URI.create(String.format("/files/%d", file.getId()));
         return ResponseEntity.created(location).body(file);
-    }
-
-    @GetMapping("/chunks")
-    public ResponseEntity<String> getChunks(@RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok("hello");
     }
 
     @GetMapping("/unsplit/{fileId}")
