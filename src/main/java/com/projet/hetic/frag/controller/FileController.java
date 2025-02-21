@@ -36,7 +36,6 @@ public class FileController {
 
     @GetMapping
     public ResponseEntity<List<File>> getFiles(@ModelAttribute FileFilterDto filters) {
-        System.out.println("filters: " + filters);
         List<File> files = fileService.getAllFile(filters);
         return ResponseEntity.ok(files);
     }
