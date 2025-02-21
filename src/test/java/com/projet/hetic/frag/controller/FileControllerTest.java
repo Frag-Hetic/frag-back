@@ -1,16 +1,19 @@
 package com.projet.hetic.frag.controller;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+import com.projet.hetic.frag.exception.EntityNotFoundException;
+import com.projet.hetic.frag.repository.FileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +42,9 @@ public class FileControllerTest {
 
   @Mock
   private FileProcessingService fileProcessingService;
+
+  @Mock
+  private FileRepository fileRepository;
 
   @InjectMocks
   private FileController fileController;
@@ -193,4 +199,38 @@ public class FileControllerTest {
 
     verify(fileProcessingService).processAndUnsplitFile(1L);
   }
+
+  @Test
+  void deleteFile_ShouldReturn200OK_WhenFileExists() {
+    // Arrange
+    Long fileId = 1L;
+    doNothing().when(fileService).deleteFileById(fileId);
+
+    // Act
+    ResponseEntity<Map<String, String>> response = fileController.deleteFile(fileId);
+
+    // Assert
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    assertThat(response.getBody()).containsEntry("status", "success");
+    assertThat(response.getBody()).containsEntry("message", "File deleted successfully");
+    verify(fileService).deleteFileById(fileId);
+  }
+
+  @Test
+  void deleteFile_ShouldReturn404NotFound_WhenFileDoesNotExist() {
+    // Arrange
+    Long nonExistentFileId = 99L;
+    doThrow(new EntityNotFoundException("File", "id", nonExistentFileId.toString()))
+            .when(fileService).deleteFileById(nonExistentFileId);
+
+    // Act & Assert
+    EntityNotFoundException exception = assertThrows(
+            EntityNotFoundException.class,
+            () -> fileController.deleteFile(nonExistentFileId)
+    );
+
+    assertThat(exception.getMessage()).contains("File", "id", "99");
+    verify(fileService).deleteFileById(nonExistentFileId);
+  }
+
 }
